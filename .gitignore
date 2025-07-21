@@ -1,0 +1,27 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# Project-level patterns
+.DS_Store
+*.log
+.env
+.env*.local
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Taskmaster AI (keep tasks in git)
+# .taskmaster/tasks/
+
+# React Native/Expo patterns (from PoseApp subdirectory)
+PoseApp/node_modules/
+PoseApp/.expo/
+PoseApp/dist/
+PoseApp/web-build/
+PoseApp/metro-cache/
+PoseApp/coverage/
+PoseApp/ios/build/
+PoseApp/android/build/
+PoseApp/*.tsbuildinfo

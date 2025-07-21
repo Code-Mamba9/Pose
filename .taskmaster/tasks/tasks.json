@@ -1,0 +1,685 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize React Native Bare Workflow Project",
+        "description": "Set up the foundational React Native project structure with bare workflow configuration, essential dependencies, and development environment",
+        "details": "Create React Native 0.72+ bare workflow project using React Native CLI. Install core dependencies: React Navigation v6+, Zustand v4.4+ with persistence, TypeScript v5.6+, ESLint, Prettier. Configure Metro bundler, set up development scripts, and establish folder structure following React Native best practices. Initialize git repository with proper .gitignore for React Native projects.",
+        "testStrategy": "Verify project builds successfully on both iOS and Android simulators. Test hot reload functionality, confirm TypeScript compilation, and validate ESLint/Prettier configuration. Ensure all core dependencies resolve correctly.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create React Native Bare Workflow Project with CLI",
+            "description": "Initialize a new React Native project using the React Native CLI with bare workflow configuration for maximum control over native code",
+            "dependencies": [],
+            "details": "Use React Native CLI to create a new project with bare workflow. Run 'npx react-native@latest init PoseApp --template react-native-template-typescript'. Verify React Native version is 0.72+ and TypeScript template is properly configured. Test initial project structure and ensure native iOS/Android folders are present.\n<info added on 2025-07-21T00:25:48.529Z>\nThe project is already set up as an Expo React Native application (SDK ~53.0.17) with TypeScript configuration active. Verified the existing project structure shows proper Expo setup with app/ directory using Expo Router, TypeScript strict mode enabled, and all necessary configurations in place. Confirmed metro bundler starts correctly with 'npx expo start' command and the development server provides options for iOS, Android, and web platforms. The existing Expo architecture is properly configured with newArchEnabled: true and includes themed components, navigation setup, and platform-specific optimizations.\n</info added on 2025-07-21T00:25:48.529Z>",
+            "status": "done",
+            "testStrategy": "Verify project creation completes without errors, confirm TypeScript configuration is active, and test basic metro bundler startup"
+          },
+          {
+            "id": 2,
+            "title": "Install and Configure Core Dependencies",
+            "description": "Install essential dependencies including React Navigation v6+, Zustand v4.4+ with persistence, TypeScript v5.6+, ESLint, and Prettier",
+            "dependencies": [],
+            "details": "Install @react-navigation/native @react-navigation/stack @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context. Install zustand@^4.4.0 zustand/middleware/persist. Upgrade typescript to v5.6+. Install @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier prettier. Configure package.json scripts for linting and formatting.",
+            "status": "done",
+            "testStrategy": "Verify all dependencies install without conflicts, test TypeScript compilation, run ESLint and Prettier commands successfully"
+          },
+          {
+            "id": 3,
+            "title": "Configure Metro Bundler and Development Scripts",
+            "description": "Set up Metro bundler configuration for optimal performance and establish development workflow scripts",
+            "dependencies": [],
+            "details": "Configure metro.config.js with proper resolver settings, asset extensions, and transformer options. Set up package.json scripts for ios, android, start, clean builds. Configure metro-react-native-babel-preset and any necessary babel plugins. Ensure proper source map generation and fast refresh configuration.",
+            "status": "done",
+            "testStrategy": "Test metro bundler starts without errors, verify fast refresh works on both platforms, confirm source maps are generated correctly"
+          },
+          {
+            "id": 4,
+            "title": "Establish Project Folder Structure and TypeScript Configuration",
+            "description": "Create a scalable folder structure following React Native best practices and configure TypeScript settings",
+            "dependencies": [],
+            "details": "Create src/ directory with subdirectories: components/, screens/, navigation/, store/, utils/, types/, assets/. Set up tsconfig.json with strict mode, path mapping for @/ imports, and proper module resolution. Configure absolute imports and ensure proper type checking for React Native modules. Create index.ts barrel exports for clean imports.",
+            "status": "done",
+            "testStrategy": "Verify TypeScript compilation with strict settings, test absolute import paths work correctly, ensure proper type checking across all directories"
+          },
+          {
+            "id": 5,
+            "title": "Initialize Git Repository with React Native Configuration",
+            "description": "Set up version control with proper .gitignore configuration for React Native projects and establish development workflow",
+            "dependencies": [],
+            "details": "Initialize git repository with 'git init'. Create comprehensive .gitignore including node_modules/, ios/build/, android/build/, .env files, metro cache, and platform-specific temporary files. Set up initial commit with project structure. Configure git hooks for pre-commit linting and formatting. Add README.md with development setup instructions.",
+            "status": "done",
+            "testStrategy": "Verify git repository initializes correctly, test .gitignore excludes appropriate files, confirm pre-commit hooks execute ESLint and Prettier successfully"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Camera System with Vision Camera",
+        "description": "Set up react-native-vision-camera v4.7.1 with frame processors and worklets for real-time camera functionality",
+        "details": "Install react-native-vision-camera v4.7.1 and react-native-worklets-core v1.3.3. Configure camera permissions for iOS (Info.plist) and Android (AndroidManifest.xml). Implement camera preview component with YUV pixel format optimization, disabled HDR/stabilization for faster initialization. Set up frame processors for real-time processing with proper buffer management and memory optimization.",
+        "testStrategy": "Test camera initialization on both platforms, verify frame rate performance (target 30+ FPS), validate permission handling, and test frame processor execution without UI blocking. Measure memory usage during camera operation.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure Vision Camera Dependencies",
+            "description": "Install react-native-vision-camera v4.7.1 and react-native-worklets-core v1.3.3 with proper platform configuration",
+            "dependencies": [],
+            "details": "Use npm/yarn to install react-native-vision-camera@4.7.1 and react-native-worklets-core@1.3.3. Run pod install for iOS. Configure metro.config.js to support worklets transformation. Add necessary gradle configurations for Android build compatibility.",
+            "status": "pending",
+            "testStrategy": "Verify installation by checking package.json versions, ensure successful iOS pod installation, and validate Android build without errors"
+          },
+          {
+            "id": 2,
+            "title": "Configure Camera Permissions for Both Platforms",
+            "description": "Set up camera and microphone permissions in iOS Info.plist and Android AndroidManifest.xml",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "Add NSCameraUsageDescription and NSMicrophoneUsageDescription to iOS Info.plist with appropriate user-facing descriptions. Add CAMERA and RECORD_AUDIO permissions to Android AndroidManifest.xml. Implement runtime permission handling using react-native-vision-camera's permission API.",
+            "status": "pending",
+            "testStrategy": "Test permission request flow on both platforms, verify proper permission denial handling, and ensure permissions persist after app restart"
+          },
+          {
+            "id": 3,
+            "title": "Implement Core Camera Preview Component",
+            "description": "Create camera preview component with optimized settings for pose detection use case",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "Create CameraView component using react-native-vision-camera with YUV pixel format for better performance. Disable HDR, video stabilization, and flash for faster initialization. Configure camera to back-facing with 30 FPS target. Implement proper component lifecycle management with camera start/stop methods.",
+            "status": "pending",
+            "testStrategy": "Test camera preview renders correctly, verify 30+ FPS performance, test camera switching between front/back, and validate proper cleanup on component unmount"
+          },
+          {
+            "id": 4,
+            "title": "Set Up Frame Processor Infrastructure",
+            "description": "Implement frame processor setup with worklets for real-time frame processing capability",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "Create frame processor using 'worklet' directive for processing camera frames. Set up proper TypeScript configuration for worklets. Implement basic frame processor that can access frame data without blocking UI thread. Configure frame processor to run at camera frame rate with proper threading.",
+            "status": "pending",
+            "testStrategy": "Verify frame processor executes without UI blocking, test frame data accessibility, validate worklet compilation, and measure frame processing latency"
+          },
+          {
+            "id": 5,
+            "title": "Implement Memory Management and Buffer Optimization",
+            "description": "Add memory optimization and buffer management for sustained camera operation",
+            "dependencies": [
+              "2.4"
+            ],
+            "details": "Implement frame buffer pooling to reduce garbage collection pressure. Add memory monitoring and cleanup strategies for long-running camera sessions. Configure automatic frame skipping under high CPU load. Implement proper error handling and recovery for memory pressure scenarios.",
+            "status": "pending",
+            "testStrategy": "Monitor memory usage during extended camera operation, test frame processing under various CPU loads, verify proper cleanup on memory warnings, and validate camera performance over 10+ minute sessions"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Integrate TensorFlow Lite with MoveNet Model",
+        "description": "Implement react-native-fast-tflite v1.6.1 with MoveNet Lightning model for real-time pose detection",
+        "details": "Install react-native-fast-tflite v1.6.1 with GPU acceleration support. Download and bundle MoveNet Lightning model (192x192, ~10ms latency). Implement model loading, input preprocessing (image resizing, normalization), and output parsing for 17 keypoint coordinates. Configure GPU delegates (CoreML for iOS, NNAPI for Android) for optimal performance. Implement tensor pooling to reduce garbage collection.",
+        "testStrategy": "Verify model loads successfully on both platforms, test pose detection accuracy with known test images, measure inference time (target <10ms), validate GPU acceleration functionality, and test memory usage during continuous inference.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure react-native-fast-tflite",
+            "description": "Install react-native-fast-tflite v1.6.1 package and configure native dependencies for both iOS and Android platforms with GPU acceleration support",
+            "dependencies": [],
+            "details": "Run 'npm install react-native-fast-tflite@1.6.1' and configure native build settings. For iOS, add Metal framework and CoreML dependencies in Podfile. For Android, configure NNAPI and GPU delegate support in build.gradle. Set up proper linking and verify native module registration.",
+            "status": "pending",
+            "testStrategy": "Verify package installation, test native module linking on both platforms, and confirm GPU delegate availability through basic library initialization tests"
+          },
+          {
+            "id": 2,
+            "title": "Download and Bundle MoveNet Lightning Model",
+            "description": "Download MoveNet Lightning model (192x192 input size) and integrate it into the React Native bundle for offline inference",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Download MoveNet Lightning model from TensorFlow Hub (movenet_lightning_192x192_int8.tflite). Place model file in assets directory for both platforms. Configure bundle to include .tflite files and implement asset loading utilities. Verify model file integrity and size optimization.",
+            "status": "pending",
+            "testStrategy": "Confirm model file is correctly bundled, test asset loading on both platforms, and validate model file integrity through checksum verification"
+          },
+          {
+            "id": 3,
+            "title": "Implement Model Loading and Initialization",
+            "description": "Create TensorFlow Lite model loading system with GPU delegate configuration and tensor pooling for memory optimization",
+            "dependencies": [
+              "3.1",
+              "3.2"
+            ],
+            "details": "Implement ModelManager class to load MoveNet model with GPU delegates (CoreML for iOS, NNAPI for Android). Configure tensor pooling to reuse input/output tensors and reduce garbage collection. Add error handling for model loading failures and fallback to CPU inference if GPU unavailable.",
+            "status": "pending",
+            "testStrategy": "Test model loading on both platforms, verify GPU delegate activation, measure initialization time, and test fallback mechanisms for GPU unavailability"
+          },
+          {
+            "id": 4,
+            "title": "Implement Input Preprocessing Pipeline",
+            "description": "Create image preprocessing system to convert camera frames to model-compatible format with proper resizing and normalization",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "Implement preprocessing functions to resize camera frames to 192x192 pixels, normalize pixel values to [0,1] range, and convert YUV to RGB format. Optimize for performance using native image processing libraries. Handle different input formats and aspect ratios with proper cropping/padding strategies.",
+            "status": "pending",
+            "testStrategy": "Test preprocessing with various image sizes and formats, validate output tensor dimensions and value ranges, and measure preprocessing performance to ensure sub-millisecond execution"
+          },
+          {
+            "id": 5,
+            "title": "Implement Output Parsing and Keypoint Extraction",
+            "description": "Create output parsing system to extract 17 keypoint coordinates from MoveNet model predictions with confidence scoring",
+            "dependencies": [
+              "3.4"
+            ],
+            "details": "Implement parseModelOutput function to extract keypoint coordinates (x, y, confidence) for all 17 body landmarks from model output tensor. Map output indices to body parts (nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles). Apply confidence thresholding and coordinate normalization to screen dimensions.",
+            "status": "pending",
+            "testStrategy": "Validate keypoint extraction accuracy with known test images, test confidence score reliability, verify coordinate mapping correctness, and measure parsing performance for real-time requirements"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Build Real-time Pose Detection Pipeline",
+        "description": "Create the complete camera-to-pose-detection pipeline with frame processing and pose visualization",
+        "details": "Integrate camera frame processors with TensorFlow Lite model inference. Implement frame preprocessing (resize, format conversion), pose detection execution in worklet context, and keypoint extraction. Create pose visualization overlay with skeletal representation and confidence indicators. Optimize pipeline for 25-60 FPS performance with adaptive frame rate based on device capabilities.",
+        "testStrategy": "Test end-to-end pipeline performance, verify real-time pose detection accuracy, measure frame rate consistency, validate pose visualization rendering, and test on various device specifications to ensure performance targets.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Camera Frame Processing Pipeline",
+            "description": "Create the core frame processing pipeline that captures camera frames and prepares them for pose detection inference",
+            "dependencies": [],
+            "details": "Set up camera frame capture using react-native-vision-camera with optimized frame processor. Implement frame preprocessing including resize to 192x192 pixels, RGB format conversion, and tensor normalization (0-255 to 0-1 range). Create frame buffer management with circular buffer to handle frame drops gracefully. Implement adaptive frame sampling based on device performance to maintain target FPS.",
+            "status": "pending",
+            "testStrategy": "Test frame capture stability across different devices, verify preprocessing accuracy with known test frames, measure frame processing latency (target <5ms), and validate frame buffer behavior under high load conditions."
+          },
+          {
+            "id": 2,
+            "title": "Integrate TensorFlow Lite Model Inference Engine",
+            "description": "Set up TensorFlow Lite model execution with MoveNet Lightning in worklet context for real-time pose detection",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Initialize TensorFlow Lite interpreter with MoveNet Lightning model in worklet context for background processing. Configure GPU delegates (Metal for iOS, OpenGL for Android) for accelerated inference. Implement tensor input/output handling with proper memory management. Create inference queue with frame scheduling to prevent blocking UI thread. Add error handling for model loading failures and inference timeouts.",
+            "status": "pending",
+            "testStrategy": "Verify model inference accuracy against reference implementations, measure inference time consistency (target <10ms), test GPU acceleration effectiveness, and validate worklet thread performance isolation."
+          },
+          {
+            "id": 3,
+            "title": "Develop Keypoint Extraction and Processing",
+            "description": "Extract and process pose keypoints from model output with confidence scoring and validation",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "Parse TensorFlow Lite output tensor to extract 17 keypoint coordinates (x, y, confidence). Implement coordinate denormalization from model space (0-1) to camera frame coordinates. Add keypoint confidence filtering with configurable thresholds (default 0.3). Create pose validation logic to detect partial occlusions and invalid poses. Implement smoothing filters (Kalman or moving average) to reduce keypoint jitter.",
+            "status": "pending",
+            "testStrategy": "Test keypoint extraction accuracy with ground truth data, verify coordinate transformation correctness, validate confidence scoring reliability, and test smoothing filter effectiveness on jittery poses."
+          },
+          {
+            "id": 4,
+            "title": "Create Real-time Pose Visualization Overlay",
+            "description": "Build pose visualization system with skeletal representation and confidence indicators overlaid on camera feed",
+            "dependencies": [
+              "4.3"
+            ],
+            "details": "Implement pose visualization using React Native Skia for hardware-accelerated rendering. Create skeletal overlay with connected keypoints forming human pose structure (17 keypoints, 16 connections). Add confidence-based styling with color coding (green: high confidence, yellow: medium, red: low). Implement pose bounding box and center point indicators. Create customizable visualization settings (show/hide keypoints, connections, confidence scores).",
+            "status": "pending",
+            "testStrategy": "Test visualization rendering performance at target FPS, verify pose overlay accuracy alignment with detected poses, validate confidence color coding, and test customization options functionality."
+          },
+          {
+            "id": 5,
+            "title": "Optimize Pipeline Performance and Frame Rate Management",
+            "description": "Implement adaptive performance optimization to maintain 25-60 FPS based on device capabilities",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3",
+              "4.4"
+            ],
+            "details": "Create performance monitoring system to track frame processing times, inference latency, and rendering performance. Implement adaptive frame rate scaling that adjusts camera FPS (15-60) based on device performance metrics. Add quality degradation gracefully by reducing inference frequency or frame resolution when performance drops. Create performance profiler with metrics dashboard showing FPS, processing times, and memory usage. Implement battery-aware optimizations for extended usage.",
+            "status": "pending",
+            "testStrategy": "Test performance across various device specifications (low-end to high-end), verify adaptive frame rate scaling effectiveness, measure battery consumption during extended usage, and validate performance metrics accuracy."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Implement Posture Analysis Engine",
+        "description": "Develop clinical-grade posture assessment algorithms for spinal curvature, shoulder alignment, and hip positioning",
+        "details": "Create PostureAnalyzer class with methods for spinal curvature measurement (cervical, thoracic, lumbar), shoulder alignment assessment with degree calculations, and hip positioning analysis. Implement confidence scoring based on keypoint detection reliability. Create normative data ranges for comparison and deviation calculations. Include multi-view analysis support for comprehensive assessment.",
+        "testStrategy": "Validate posture calculations against known clinical measurements, test with various body types and positions, verify confidence scoring accuracy, and compare results with professional posture assessment tools.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Core PostureAnalyzer Class Structure",
+            "description": "Establish the foundational PostureAnalyzer class with core architecture for posture assessment algorithms",
+            "dependencies": [],
+            "details": "Create PostureAnalyzer.ts class with constructor accepting pose keypoints and confidence thresholds. Define interfaces for PoseKeypoints, PostureMetrics, and ConfidenceScores. Implement basic keypoint validation and filtering methods. Set up error handling for invalid or missing keypoint data. Create utility methods for angle calculations and distance measurements between keypoints.",
+            "status": "pending",
+            "testStrategy": "Unit tests for class instantiation, keypoint validation, and basic geometric calculations with known coordinate sets"
+          },
+          {
+            "id": 2,
+            "title": "Implement Spinal Curvature Analysis",
+            "description": "Develop algorithms for measuring cervical, thoracic, and lumbar spinal curvature from pose keypoints",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Implement calculateSpinalCurvature method using neck, shoulder, hip, and knee keypoints to estimate spinal alignment. Create separate functions for cervical (C7-head angle), thoracic (shoulder-hip alignment), and lumbar (hip-knee relationship) measurements. Use vector mathematics to calculate curvature angles and deviations from ideal posture. Implement smoothing algorithms to reduce noise from keypoint detection variations.",
+            "status": "pending",
+            "testStrategy": "Test with known posture positions (straight, forward head, rounded shoulders), validate angle calculations against manual measurements, test with various body orientations"
+          },
+          {
+            "id": 3,
+            "title": "Develop Shoulder Alignment Assessment",
+            "description": "Create shoulder positioning analysis with precise degree calculations for asymmetry and elevation",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Implement calculateShoulderAlignment method measuring left-right shoulder height differences, forward protraction angles, and elevation asymmetry. Calculate shoulder-to-neck angles for forward head posture detection. Use shoulder and ear keypoints to determine protraction severity. Implement bilateral comparison algorithms to detect uneven shoulder positioning with degree-based scoring system.",
+            "status": "pending",
+            "testStrategy": "Test shoulder asymmetry detection with simulated uneven positioning, validate protraction angle calculations, verify bilateral comparison accuracy"
+          },
+          {
+            "id": 4,
+            "title": "Build Hip Positioning Analysis System",
+            "description": "Implement hip alignment assessment for pelvic tilt and lateral shift detection",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Create calculateHipAlignment method using hip and knee keypoints to assess pelvic positioning. Implement anterior/posterior pelvic tilt calculations using hip-to-torso angles. Develop lateral hip shift detection comparing left-right hip positioning relative to spine centerline. Include weight distribution analysis based on hip-to-ankle alignment. Create scoring system for hip stability and positioning deviations.",
+            "status": "pending",
+            "testStrategy": "Test pelvic tilt detection with various standing positions, validate lateral shift measurements, verify weight distribution calculations"
+          },
+          {
+            "id": 5,
+            "title": "Implement Confidence Scoring and Normative Data System",
+            "description": "Create comprehensive confidence scoring based on keypoint reliability and establish normative data ranges for posture assessment",
+            "dependencies": [
+              "5.2",
+              "5.3",
+              "5.4"
+            ],
+            "details": "Implement calculateConfidenceScore method using keypoint detection confidence values, occlusion detection, and measurement consistency across frames. Create normative data ranges for each posture metric (normal, mild deviation, moderate deviation, severe deviation). Implement multi-view analysis support for combining measurements from different camera angles. Create comprehensive posture report generation with confidence-weighted scoring and clinical recommendations.",
+            "status": "pending",
+            "testStrategy": "Validate confidence scoring correlates with measurement accuracy, test normative range classifications against clinical standards, verify multi-view analysis integration, test comprehensive report generation"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Setup Local Data Storage with MMKV and SQLite",
+        "description": "Implement secure local storage system for user data, pose analysis results, and application state",
+        "details": "Install react-native-mmkv v2.10.1 for fast key-value storage and react-native-sqlite-storage v6.0.1 for structured data. Create database schema for users, posture sessions, analysis results, and progress tracking. Implement data encryption using react-native-keychain v8.1.0 for sensitive information. Set up automated cleanup policies and data retention management.",
+        "testStrategy": "Test data persistence across app restarts, verify encryption functionality, validate database schema integrity, test data migration scenarios, and measure storage performance with large datasets.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure Local Storage Dependencies",
+            "description": "Install react-native-mmkv v2.10.1, react-native-sqlite-storage v6.0.1, and react-native-keychain v8.1.0 with proper platform configuration",
+            "dependencies": [],
+            "details": "Install dependencies using npm/yarn with exact versions. Configure native linking for iOS (update Podfile, run pod install) and Android (update build.gradle files). Set up MMKV initialization in App.tsx with default storage location. Configure SQLite database path and encryption settings. Initialize keychain access with biometric authentication support where available.",
+            "status": "pending",
+            "testStrategy": "Verify successful installation by importing all libraries, test MMKV basic read/write operations, confirm SQLite database creation, and validate keychain access on both platforms"
+          },
+          {
+            "id": 2,
+            "title": "Design and Implement Database Schema",
+            "description": "Create comprehensive SQLite database schema for users, posture sessions, analysis results, and progress tracking with proper indexing and relationships",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Define tables: users (id, profile_data, preferences), posture_sessions (id, user_id, timestamp, duration, session_type), analysis_results (id, session_id, pose_data, confidence_scores, recommendations), progress_tracking (id, user_id, metrics, trends, goals). Implement proper foreign key constraints, indexes for performance, and migration scripts for schema updates. Create database helper class with CRUD operations for each entity.",
+            "status": "pending",
+            "testStrategy": "Test schema creation and migration scripts, validate foreign key constraints, verify index performance with sample data, and test CRUD operations for all tables"
+          },
+          {
+            "id": 3,
+            "title": "Implement Data Encryption and Security Layer",
+            "description": "Set up comprehensive encryption for sensitive data using react-native-keychain with biometric authentication and data obfuscation",
+            "dependencies": [
+              "6.1",
+              "6.2"
+            ],
+            "details": "Configure keychain storage for encryption keys with biometric authentication. Implement AES-256 encryption for sensitive user data before SQLite storage. Create secure storage wrapper that automatically encrypts/decrypts data. Set up key rotation mechanism and secure key derivation. Implement data anonymization for analytics and crash reports. Create security utilities for data validation and sanitization.",
+            "status": "pending",
+            "testStrategy": "Test encryption/decryption cycles, verify biometric authentication flows, validate key rotation functionality, and test data security under various attack scenarios"
+          },
+          {
+            "id": 4,
+            "title": "Build Storage Management and API Layer",
+            "description": "Create unified storage API with MMKV for app state and SQLite for structured data, including data synchronization and caching strategies",
+            "dependencies": [
+              "6.2",
+              "6.3"
+            ],
+            "details": "Implement StorageManager class with methods for user preferences (MMKV), posture data (SQLite), and session cache (MMKV). Create data access objects (DAOs) for each entity with automatic encryption/decryption. Implement caching layer with TTL for frequently accessed data. Set up data synchronization between MMKV and SQLite where needed. Create backup and restore functionality for user data export/import.",
+            "status": "pending",
+            "testStrategy": "Test unified API functionality, verify caching performance and TTL behavior, validate data synchronization accuracy, and test backup/restore operations"
+          },
+          {
+            "id": 5,
+            "title": "Implement Data Retention and Cleanup Policies",
+            "description": "Set up automated data cleanup policies, storage optimization, and data retention management with configurable retention periods",
+            "dependencies": [
+              "6.4"
+            ],
+            "details": "Implement background cleanup service for old session data based on user preferences and storage limits. Create data archival system for long-term storage with compression. Set up storage monitoring with alerts for low space conditions. Implement configurable retention policies (30/90/365 days) for different data types. Create data export functionality before cleanup. Set up automated database optimization (VACUUM, REINDEX) on app startup.",
+            "status": "pending",
+            "testStrategy": "Test cleanup policies with various retention settings, verify storage monitoring accuracy, validate data archival and compression, and test database optimization performance impact"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Integrate AI SDK with Multiple Provider Support",
+        "description": "Implement Vercel AI SDK v4.3.19 with OpenAI, Claude, and local model support for intelligent chat functionality",
+        "details": "Install AI SDK v4.3.19 and configure provider-agnostic architecture. Set up OpenAI GPT-3.5 Turbo as primary provider, Anthropic Claude for advanced analysis, and ONNX Runtime for local inference. Implement secure API key management in device keychain, rate limiting, and error handling across providers. Create context-aware prompt engineering system with posture data integration.",
+        "testStrategy": "Test provider switching functionality, verify API key security, validate streaming responses, test offline local model inference, and ensure proper error handling for network failures and rate limits.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure Vercel AI SDK v4.3.19",
+            "description": "Set up the core AI SDK infrastructure with provider-agnostic architecture",
+            "dependencies": [],
+            "details": "Install Vercel AI SDK v4.3.19 using npm/yarn. Configure the base AI client with provider abstraction layer. Set up TypeScript types and interfaces for multiple providers. Create configuration files for different AI providers (OpenAI, Anthropic, local models). Implement provider factory pattern for seamless switching between different AI services.",
+            "status": "pending",
+            "testStrategy": "Verify SDK installation, test provider factory initialization, validate TypeScript types compilation"
+          },
+          {
+            "id": 2,
+            "title": "Implement OpenAI GPT-3.5 Turbo Provider Integration",
+            "description": "Set up OpenAI as the primary AI provider with streaming support",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Configure OpenAI provider with GPT-3.5 Turbo model. Implement API key management with secure storage in device keychain. Set up streaming chat functionality with proper error handling and retry logic. Implement rate limiting to prevent API quota exhaustion. Create message formatting and response parsing specific to OpenAI API format.",
+            "status": "pending",
+            "testStrategy": "Test API connectivity, verify streaming responses, validate rate limiting, test error handling for invalid API keys"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Anthropic Claude Provider for Advanced Analysis",
+            "description": "Add Claude as secondary provider for complex posture analysis tasks",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Configure Anthropic Claude provider with appropriate model selection. Implement Claude-specific message formatting and system prompts. Set up provider routing logic to determine when to use Claude for advanced analysis. Implement fallback mechanisms when Claude is unavailable. Configure Claude for posture data interpretation and clinical insights.",
+            "status": "pending",
+            "testStrategy": "Test Claude API integration, verify provider switching logic, validate fallback mechanisms, test posture analysis capabilities"
+          },
+          {
+            "id": 4,
+            "title": "Set Up Local Model Support with ONNX Runtime",
+            "description": "Implement offline AI capabilities using ONNX Runtime for privacy-focused inference",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Install and configure ONNX Runtime for React Native. Download and bundle appropriate local models for basic chat and posture analysis. Implement model loading and inference pipeline. Set up input preprocessing and output postprocessing for local models. Create offline detection and automatic fallback to local models when network is unavailable.",
+            "status": "pending",
+            "testStrategy": "Test local model loading, verify offline inference functionality, validate model performance, test automatic offline detection"
+          },
+          {
+            "id": 5,
+            "title": "Implement Context-Aware Prompt Engineering with Posture Data Integration",
+            "description": "Create intelligent prompt system that integrates posture analysis data with AI conversations",
+            "dependencies": [
+              "7.2",
+              "7.3",
+              "7.4"
+            ],
+            "details": "Develop prompt engineering system that incorporates posture data into AI conversations. Create context management for maintaining conversation history with posture insights. Implement dynamic prompt generation based on current posture analysis results. Set up data sanitization and privacy protection for posture data before sending to external providers. Create specialized prompts for different use cases (coaching, analysis, recommendations).",
+            "status": "pending",
+            "testStrategy": "Test prompt generation with posture data, verify data privacy protection, validate context management, test conversation flow with integrated posture insights"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Develop Chat Interface with Gifted Chat",
+        "description": "Create intelligent chat interface for posture guidance and educational content delivery",
+        "details": "Install react-native-gifted-chat v2.4.0 and implement chat UI with custom message types for posture analysis results. Create context-aware response system that incorporates current posture data and user history. Implement message persistence, typing indicators, and streaming response support. Add educational content delivery system with evidence-based posture guidance.",
+        "testStrategy": "Test chat interface responsiveness, verify message persistence, validate context-aware responses accuracy, test streaming message delivery, and ensure proper integration with posture analysis data.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure react-native-gifted-chat",
+            "description": "Set up react-native-gifted-chat v2.4.0 with basic configuration and essential dependencies for chat functionality",
+            "dependencies": [],
+            "details": "Install react-native-gifted-chat v2.4.0 using npm/yarn. Configure basic chat component with minimal props including messages array, onSend callback, and user object. Set up proper TypeScript types for GiftedChat components. Configure auto-linking for native dependencies and verify installation on both iOS and Android platforms.",
+            "status": "pending",
+            "testStrategy": "Verify package installation, test basic chat rendering on both platforms, confirm TypeScript compilation without errors, and validate that chat component displays correctly with mock messages."
+          },
+          {
+            "id": 2,
+            "title": "Implement Custom Message Types for Posture Analysis",
+            "description": "Create custom message components to display posture analysis results, keypoint visualizations, and assessment scores within chat interface",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "Extend GiftedChat's renderCustomView to create PostureAnalysisMessage component. Design visual representations for pose keypoints, spinal curvature measurements, and confidence scores. Implement message types for real-time posture feedback, historical analysis summaries, and educational content with embedded media. Create proper message data structures and rendering logic.",
+            "status": "pending",
+            "testStrategy": "Test custom message rendering with various posture data formats, verify visual components display correctly, validate message type differentiation, and ensure smooth scrolling performance with complex message content."
+          },
+          {
+            "id": 3,
+            "title": "Develop Context-Aware Response System",
+            "description": "Build intelligent response engine that incorporates current posture data and user history to provide personalized guidance",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "Create PostureResponseEngine class that analyzes current posture metrics, user conversation history, and assessment trends. Implement response templates for different posture conditions (forward head posture, rounded shoulders, etc.). Build context aggregation system that combines real-time pose data with historical patterns. Create response prioritization based on severity and user engagement patterns.",
+            "status": "pending",
+            "testStrategy": "Test response accuracy with various posture scenarios, validate context integration from pose analysis, verify response relevance to user history, and measure response generation latency for real-time interactions."
+          },
+          {
+            "id": 4,
+            "title": "Implement Message Persistence and Chat State Management",
+            "description": "Set up local storage for chat history, user preferences, and conversation context with proper data synchronization",
+            "dependencies": [
+              "8.3"
+            ],
+            "details": "Integrate AsyncStorage or SQLite for persistent message storage. Implement ChatStore using Zustand for state management with message history, user preferences, and conversation threads. Create data models for chat messages, user interactions, and posture session linkage. Implement offline support with message queuing and sync capabilities. Add conversation threading for different posture topics.",
+            "status": "pending",
+            "testStrategy": "Test message persistence across app restarts, verify data integrity during concurrent operations, validate offline message queuing, and test conversation thread management with multiple topic discussions."
+          },
+          {
+            "id": 5,
+            "title": "Add Streaming Responses and Educational Content Delivery",
+            "description": "Implement real-time message streaming, typing indicators, and structured educational content delivery system with evidence-based posture guidance",
+            "dependencies": [
+              "8.4"
+            ],
+            "details": "Implement streaming message support with progressive text rendering and typing indicators. Create EducationalContentManager for delivering structured posture guidance, exercise recommendations, and evidence-based tips. Build content categorization system (beginner/intermediate/advanced) with progress tracking. Implement adaptive content delivery based on user posture improvement metrics and engagement patterns. Add multimedia support for exercise demonstrations and posture correction videos.",
+            "status": "pending",
+            "testStrategy": "Test streaming message delivery performance, verify typing indicator accuracy, validate educational content categorization and delivery, test adaptive content algorithms with user progress simulation, and ensure multimedia content loads properly within chat interface."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement Google Authentication System",
+        "description": "Set up Google OAuth 2.0 authentication with local-first approach and guest mode support",
+        "details": "Install @react-native-google-signin/google-signin v15.0.0 and configure OAuth 2.0 for both platforms. Implement authentication state management with Zustand, secure token storage in keychain, and user profile caching. Create guest mode functionality allowing full app access without authentication. Ensure authentication is used only for user identification, not data synchronization.",
+        "testStrategy": "Test Google OAuth flow on both platforms, verify token security and automatic refresh, validate guest mode functionality, test user profile persistence, and ensure privacy compliance with local-first architecture.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure Google Sign-In Dependencies",
+            "description": "Install @react-native-google-signin/google-signin v15.0.0 and configure platform-specific settings for OAuth 2.0",
+            "dependencies": [],
+            "details": "Install @react-native-google-signin/google-signin v15.0.0 using npm/yarn. Configure iOS by adding GoogleService-Info.plist to iOS project and updating Info.plist with URL schemes. Configure Android by adding google-services.json to android/app and updating build.gradle files with Google services plugin. Set up OAuth 2.0 client IDs in Google Cloud Console for both platforms.",
+            "status": "pending",
+            "testStrategy": "Verify installation by importing the library without errors, test that GoogleService-Info.plist and google-services.json are properly recognized by the build system, and validate that OAuth client IDs are correctly configured."
+          },
+          {
+            "id": 2,
+            "title": "Implement Authentication State Management with Zustand",
+            "description": "Create Zustand store for authentication state management with user profile data and authentication status",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "Create authStore using Zustand with state for isAuthenticated, user profile (id, name, email, photo), loading states, and error handling. Implement actions for signIn, signOut, setUser, and clearError. Include persistence middleware to maintain authentication state across app restarts. Design store to support both authenticated and guest modes seamlessly.",
+            "status": "pending",
+            "testStrategy": "Test store state updates during authentication flow, verify persistence across app restarts, validate that guest mode state is properly managed, and ensure error states are correctly handled and cleared."
+          },
+          {
+            "id": 3,
+            "title": "Implement Secure Token Storage and Management",
+            "description": "Set up secure token storage using keychain services with automatic refresh and secure retrieval",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "Install react-native-keychain for secure token storage. Implement TokenManager class with methods for storing, retrieving, and clearing OAuth tokens in device keychain. Add automatic token refresh logic with retry mechanisms. Implement token validation and expiry checking. Ensure tokens are encrypted and stored securely according to platform best practices.",
+            "status": "pending",
+            "testStrategy": "Test token storage and retrieval from keychain, verify automatic refresh functionality works correctly, validate that expired tokens are properly handled, and ensure tokens are securely encrypted and cannot be accessed by other apps."
+          },
+          {
+            "id": 4,
+            "title": "Create Google OAuth Authentication Flow",
+            "description": "Implement complete Google sign-in flow with error handling and user profile management",
+            "dependencies": [
+              "9.3"
+            ],
+            "details": "Implement GoogleSignIn service class with signIn, signOut, and getCurrentUser methods. Handle OAuth flow with proper error handling for user cancellation, network errors, and API failures. Implement user profile fetching and caching. Add automatic sign-in check on app startup to restore previous authentication state. Ensure compliance with Google's OAuth policies and user consent requirements.",
+            "status": "pending",
+            "testStrategy": "Test complete sign-in flow on both platforms, verify error handling for various failure scenarios, validate user profile data is correctly fetched and stored, test automatic sign-in restoration, and ensure proper sign-out clears all stored data."
+          },
+          {
+            "id": 5,
+            "title": "Implement Guest Mode Functionality",
+            "description": "Create guest mode that allows full app access without authentication while maintaining clear distinction from authenticated state",
+            "dependencies": [
+              "9.4"
+            ],
+            "details": "Implement guest mode toggle in authentication flow allowing users to skip sign-in. Create GuestModeManager to handle guest user sessions with local-only data storage. Ensure all app features remain accessible in guest mode with local data persistence. Add UI indicators to distinguish between guest and authenticated modes. Implement easy transition from guest to authenticated mode with data preservation options.",
+            "status": "pending",
+            "testStrategy": "Test that all app features work correctly in guest mode, verify local data persistence for guest users, validate UI properly indicates guest mode status, test smooth transition from guest to authenticated mode, and ensure guest data can be optionally preserved or cleared during authentication."
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Build Progress Tracking Dashboard",
+        "description": "Create comprehensive dashboard for posture progress visualization, goal tracking, and data export",
+        "details": "Install victory-native v37.5.1 for data visualization and implement progress tracking dashboard. Create trend analysis charts for posture metrics over time, goal setting interface with milestone tracking, and comparative analysis against baseline measurements. Implement data export functionality (PDF, CSV, JSON) and report generation for professional sharing. Add reminder system for consistent usage tracking.",
+        "testStrategy": "Test chart rendering performance with large datasets, verify data export functionality across formats, validate goal tracking accuracy, test report generation quality, and ensure dashboard responsiveness on various screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Victory Native and Set Up Data Visualization Infrastructure",
+            "description": "Install victory-native v37.5.1 and configure the basic charting infrastructure for the progress tracking dashboard",
+            "dependencies": [],
+            "details": "Install victory-native v37.5.1 using npm/yarn. Create a ChartProvider component to handle chart configurations and theming. Set up responsive chart containers with proper scaling for different screen sizes. Configure chart color schemes and animation settings. Create reusable chart components (LineChart, BarChart, AreaChart) with standardized props interface.",
+            "status": "pending",
+            "testStrategy": "Test chart rendering on different device sizes, verify victory-native installation and basic chart functionality, validate responsive behavior across screen orientations"
+          },
+          {
+            "id": 2,
+            "title": "Implement Trend Analysis Charts for Posture Metrics",
+            "description": "Create comprehensive trend visualization charts showing posture improvement over time with multiple metric tracking",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Build PostureTrendChart component using victory-native LineChart for displaying spinal curvature, shoulder alignment, and hip positioning trends over time. Implement time range selectors (7 days, 30 days, 90 days, 1 year). Add data aggregation functions for daily, weekly, and monthly averages. Include comparison overlays for multiple metrics on single chart with toggle functionality. Add zoom and pan interactions for detailed data exploration.",
+            "status": "pending",
+            "testStrategy": "Test with large datasets to verify performance, validate trend calculations accuracy, test time range filtering, verify chart interactions and responsiveness"
+          },
+          {
+            "id": 3,
+            "title": "Build Goal Setting and Milestone Tracking Interface",
+            "description": "Create goal management system with progress visualization and milestone tracking capabilities",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Design GoalManager component with goal creation, editing, and deletion functionality. Implement milestone tracking with visual progress indicators using victory-native progress charts. Create goal categories (spinal alignment, posture consistency, exercise completion). Add progress notifications and achievement celebrations. Implement goal template system for common posture improvement targets with customizable parameters.",
+            "status": "pending",
+            "testStrategy": "Test goal creation and modification workflows, verify milestone calculation accuracy, validate progress tracking against actual posture data, test notification system"
+          },
+          {
+            "id": 4,
+            "title": "Implement Data Export and Report Generation System",
+            "description": "Build comprehensive data export functionality supporting PDF, CSV, and JSON formats with professional report generation",
+            "dependencies": [
+              "10.2",
+              "10.3"
+            ],
+            "details": "Install react-native-pdf-lib for PDF generation and implement DataExporter service class. Create PDF report templates with charts, trend analysis, and goal progress summaries. Implement CSV export for raw posture data with proper formatting. Add JSON export for complete data backup. Create professional report layouts with branding, date ranges, and statistical summaries. Include email sharing functionality for reports.",
+            "status": "pending",
+            "testStrategy": "Test export functionality across all formats, verify PDF report quality and formatting, validate CSV data integrity, test email sharing on different platforms, verify large dataset export performance"
+          },
+          {
+            "id": 5,
+            "title": "Develop Reminder System and Dashboard Integration",
+            "description": "Create intelligent reminder system for consistent usage tracking and integrate all components into cohesive dashboard interface",
+            "dependencies": [
+              "10.2",
+              "10.3",
+              "10.4"
+            ],
+            "details": "Implement ReminderManager with configurable notification schedules for posture checks and exercise routines. Create ProgressDashboard main component integrating all visualization components with navigation tabs. Add dashboard customization options for widget arrangement and metric priorities. Implement data refresh mechanisms and loading states. Create summary cards showing key metrics and recent achievements with quick action buttons.",
+            "status": "pending",
+            "testStrategy": "Test reminder notifications across different schedules, verify dashboard component integration and navigation, validate data refresh functionality, test customization persistence, ensure dashboard performance with all components loaded"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-20T23:48:52.376Z",
+      "updated": "2025-07-21T12:45:14.821Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
