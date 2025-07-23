@@ -3,6 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
+The React Native app is under Pose/PoseApp, not the project root dir.
+This is React Native Expo project. Prioritize expo specific cmds over npm cmds.
 
 This is an Expo React Native application called "Pose" built with:
 - **Framework**: Expo SDK ~53.0.17 with React Native 0.79.5 and React 19.0.0

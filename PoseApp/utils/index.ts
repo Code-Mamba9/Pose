@@ -51,3 +51,6 @@ export const debounce = <T extends (...args: any[]) => void>(
 export const asyncDelay = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+// Permission management exports
+export * from './PermissionManager';
