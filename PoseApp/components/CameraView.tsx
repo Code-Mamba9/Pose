@@ -17,6 +17,9 @@ interface CameraViewProps {
     enableMetrics?: boolean;
     enableAsyncProcessing?: boolean;
     logFrameInfo?: boolean;
+    enableMemoryOptimization?: boolean;
+    enableFrameSkipping?: boolean;
+    memoryThreshold?: number;
   };
   style?: any;
 }
@@ -44,6 +47,9 @@ export function CameraView({
     enableMetrics: true,
     enableAsyncProcessing: false,
     logFrameInfo: true, // Enable detailed logging by default
+    enableMemoryOptimization: true,
+    enableFrameSkipping: true,
+    memoryThreshold: 50,
     ...frameProcessorConfig
   };
   

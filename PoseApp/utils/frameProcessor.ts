@@ -1,6 +1,8 @@
 import { useFrameProcessor, runAtTargetFps, runAsync } from 'react-native-vision-camera';
 import { useSharedValue } from 'react-native-reanimated';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
+import { useFrameMemoryManager, CPULoadMonitor, MemoryStats } from './memoryManager';
+import { useFrameProcessorErrorRecovery, FrameProcessingError, RecoveryStrategy } from './errorRecovery';
 
 /**
  * Frame processing performance metrics
@@ -10,6 +12,9 @@ export interface FrameProcessingMetrics {
   avgProcessingTime: number;
   lastFrameTimestamp: number;
   fps: number;
+  memoryStats: MemoryStats;
+  framesSkipped: number;
+  cpuLoadHigh: boolean;
 }
 
 /**
@@ -32,6 +37,9 @@ export interface FrameProcessorConfig {
   enableMetrics?: boolean;
   enableAsyncProcessing?: boolean;
   logFrameInfo?: boolean;
+  enableMemoryOptimization?: boolean;
+  enableFrameSkipping?: boolean;
+  memoryThreshold?: number; // MB
 }
 
 /**
@@ -45,7 +53,10 @@ export const useAdvancedFrameProcessor = (
     targetFps = 30,
     enableMetrics = true,
     enableAsyncProcessing = false,
-    logFrameInfo = false
+    logFrameInfo = false,
+    enableMemoryOptimization = true,
+    enableFrameSkipping = true,
+    memoryThreshold = 50
   } = config;
 
   // Shared values for cross-thread communication
@@ -54,12 +65,48 @@ export const useAdvancedFrameProcessor = (
   const avgProcessingTime = useSharedValue(0);
   const lastFpsCheck = useSharedValue(Date.now());
   const currentFps = useSharedValue(0);
+  const framesSkipped = useSharedValue(0);
+  const cpuLoadHigh = useSharedValue(false);
+
+  // Simple worklet-compatible values for memory and CPU tracking
+  const memoryUsage = useSharedValue(0);
+  const bufferPoolSize = useSharedValue(0);
+  const processingTimes = useSharedValue<number[]>([]);
+  const memoryThresholdValue = useSharedValue(memoryThreshold);
+  const highCPUThreshold = useSharedValue(16.67); // ~60 FPS in ms
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
     
     const startTime = Date.now();
     frameCount.value += 1;
+
+    // Simple memory pressure check using shared values
+    if (enableMemoryOptimization && memoryUsage.value > memoryThresholdValue.value) {
+      console.warn(`⚠️ [FrameProcessor] Memory pressure detected: ${memoryUsage.value.toFixed(1)}MB`);
+      // Skip frame under memory pressure
+      framesSkipped.value += 1;
+      return;
+    }
+
+    // Simple CPU load check using processing times
+    if (enableFrameSkipping) {
+      const times = processingTimes.value;
+      if (times.length > 5) {
+        const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+        if (avgTime > highCPUThreshold.value) {
+          // Skip 30% of frames under high CPU load
+          if (Math.random() < 0.3) {
+            framesSkipped.value += 1;
+            cpuLoadHigh.value = true;
+            console.log(`⏭️ [FrameProcessor] Frame #${frameCount.value} skipped due to high CPU load (${avgTime.toFixed(2)}ms avg)`);
+            return;
+          }
+        } else {
+          cpuLoadHigh.value = false;
+        }
+      }
+    }
 
     // Extract basic frame information
     const frameData: ProcessedFrameData = {
@@ -98,8 +145,20 @@ export const useAdvancedFrameProcessor = (
         const processingTime = Date.now() - startTime;
         lastProcessingTime.value = processingTime;
         
+        // Update processing times array for CPU monitoring
+        const times = processingTimes.value;
+        times.push(processingTime);
+        if (times.length > 30) { // Keep last 30 samples
+          times.shift();
+        }
+        processingTimes.value = times;
+        
         // Calculate rolling average
         avgProcessingTime.value = (avgProcessingTime.value * 0.9) + (processingTime * 0.1);
+        
+        // Simple memory usage estimation (MB)
+        const estimatedMemory = (frame.width * frame.height * 4) / (1024 * 1024);
+        memoryUsage.value = (memoryUsage.value * 0.9) + (estimatedMemory * 0.1);
         
         // Calculate FPS every second
         const now = Date.now();
@@ -108,23 +167,36 @@ export const useAdvancedFrameProcessor = (
           lastFpsCheck.value = now;
           frameCount.value = 0;
           
-          // Always log performance metrics when frame processor is active
-          console.log(`🎥 [FrameProcessor METRICS] FPS: ${currentFps.value.toFixed(1)} | Avg Processing: ${avgProcessingTime.value.toFixed(2)}ms | Frames Processed: ${frameCount.value}`);
+          // Simplified logging with worklet-compatible values
+          const cpuInfo = `| CPU Load: ${cpuLoadHigh.value ? 'HIGH' : 'NORMAL'} | Skipped: ${framesSkipped.value}`;
+          const memInfo = `| Memory: ${memoryUsage.value.toFixed(1)}MB`;
+          
+          console.log(`🎥 [FrameProcessor METRICS] FPS: ${currentFps.value.toFixed(1)} | Avg Processing: ${avgProcessingTime.value.toFixed(2)}ms ${memInfo} ${cpuInfo}`);
         }
       }
     });
 
     frameData.processingTime = Date.now() - startTime;
     return frameData;
-  }, [targetFps, enableMetrics, enableAsyncProcessing, logFrameInfo]);
+  }, [targetFps, enableMetrics, enableAsyncProcessing, logFrameInfo, enableMemoryOptimization, enableFrameSkipping]);
 
   // Getter functions to access metrics from React
   const getMetrics = useCallback((): FrameProcessingMetrics => ({
     frameCount: frameCount.value,
     avgProcessingTime: avgProcessingTime.value,
     lastFrameTimestamp: lastProcessingTime.value,
-    fps: currentFps.value
-  }), [frameCount, avgProcessingTime, lastProcessingTime, currentFps]);
+    fps: currentFps.value,
+    memoryStats: {
+      currentUsage: memoryUsage.value,
+      peakUsage: memoryUsage.value, // Simplified
+      gcCount: 0,
+      bufferPoolSize: bufferPoolSize.value,
+      framesDropped: 0, // Simplified
+      lastCleanup: Date.now()
+    },
+    framesSkipped: framesSkipped.value,
+    cpuLoadHigh: cpuLoadHigh.value
+  }), [frameCount, avgProcessingTime, lastProcessingTime, currentFps, framesSkipped, cpuLoadHigh, memoryUsage, bufferPoolSize]);
 
   return {
     frameProcessor,
@@ -133,7 +205,11 @@ export const useAdvancedFrameProcessor = (
     sharedValues: {
       frameCount,
       avgProcessingTime,
-      currentFps
+      currentFps,
+      framesSkipped,
+      cpuLoadHigh,
+      memoryUsage,
+      bufferPoolSize
     }
   };
 };

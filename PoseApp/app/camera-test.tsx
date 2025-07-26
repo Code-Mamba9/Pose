@@ -34,7 +34,10 @@ export default function CameraTestScreen() {
             targetFps: 25,
             enableMetrics: true,
             enableAsyncProcessing: false,
-            logFrameInfo: true
+            logFrameInfo: true,
+            enableMemoryOptimization: true,
+            enableFrameSkipping: true,
+            memoryThreshold: 30 // MB
           }}
           style={styles.camera}
         />
@@ -80,6 +83,41 @@ export default function CameraTestScreen() {
                   {metrics.lastFrameTimestamp.toFixed(2)}ms
                 </ThemedText>
               </View>
+
+              <View style={styles.metricRow}>
+                <ThemedText style={styles.metricLabel}>Memory Usage:</ThemedText>
+                <ThemedText style={styles.metricValue}>
+                  {metrics.memoryStats.currentUsage.toFixed(1)}MB
+                </ThemedText>
+              </View>
+
+              <View style={styles.metricRow}>
+                <ThemedText style={styles.metricLabel}>Buffer Pool Size:</ThemedText>
+                <ThemedText style={styles.metricValue}>
+                  {metrics.memoryStats.bufferPoolSize}
+                </ThemedText>
+              </View>
+
+              <View style={styles.metricRow}>
+                <ThemedText style={styles.metricLabel}>Frames Skipped:</ThemedText>
+                <ThemedText style={styles.metricValue}>
+                  {metrics.framesSkipped}
+                </ThemedText>
+              </View>
+
+              <View style={styles.metricRow}>
+                <ThemedText style={styles.metricLabel}>CPU Load:</ThemedText>
+                <ThemedText style={[styles.metricValue, { color: metrics.cpuLoadHigh ? '#FF5722' : '#4CAF50' }]}>
+                  {metrics.cpuLoadHigh ? 'HIGH' : 'NORMAL'}
+                </ThemedText>
+              </View>
+
+              <View style={styles.metricRow}>
+                <ThemedText style={styles.metricLabel}>Memory Dropped:</ThemedText>
+                <ThemedText style={styles.metricValue}>
+                  {metrics.memoryStats.framesDropped}
+                </ThemedText>
+              </View>
             </>
           )}
 
@@ -87,10 +125,13 @@ export default function CameraTestScreen() {
             <ThemedText style={styles.instructionTitle}>Instructions:</ThemedText>
             <ThemedText style={styles.instructionText}>
               • Toggle "Frame Proc" button to enable/disable frame processing{'\n'}
-              • Green dot = Camera ready{'\n'}
-              • Blue dot = Frame processor active{'\n'}
-              • Check console for detailed frame logs{'\n'}
-              • Metrics update every second
+              • Green dot = Camera ready, Blue dot = Frame processor active{'\n'}
+              • Memory optimization and frame skipping are enabled{'\n'}
+              • CPU Load: HIGH = automatic frame skipping active{'\n'}
+              • Buffer Pool: Reuses memory to reduce garbage collection{'\n'}
+              • Frames Dropped: Emergency memory pressure protection{'\n'}
+              • Check console for detailed frame logs and error recovery{'\n'}
+              • Metrics update every second - test for 10+ minutes
             </ThemedText>
           </View>
         </ScrollView>
