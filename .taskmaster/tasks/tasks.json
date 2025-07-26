@@ -98,7 +98,7 @@
               "2.2"
             ],
             "details": "Create CameraView component using react-native-vision-camera with YUV pixel format for better performance. Disable HDR, video stabilization, and flash for faster initialization. Configure camera to back-facing with 30 FPS target. Implement proper component lifecycle management with camera start/stop methods.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test camera preview renders correctly, verify 30+ FPS performance, test camera switching between front/back, and validate proper cleanup on component unmount"
           },
           {
@@ -109,7 +109,7 @@
               "2.3"
             ],
             "details": "Create frame processor using 'worklet' directive for processing camera frames. Set up proper TypeScript configuration for worklets. Implement basic frame processor that can access frame data without blocking UI thread. Configure frame processor to run at camera frame rate with proper threading.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Verify frame processor executes without UI blocking, test frame data accessibility, validate worklet compilation, and measure frame processing latency"
           },
           {
@@ -678,7 +678,7 @@
     ],
     "metadata": {
       "created": "2025-07-20T23:48:52.376Z",
-      "updated": "2025-07-23T12:26:25.024Z",
+      "updated": "2025-07-26T00:50:53.200Z",
       "description": "Tasks for master context"
     }
   }
