@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { Platform, StyleSheet, TouchableOpacity } from "react-native";
+import { Link } from "expo-router";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -48,6 +49,42 @@ export default function HomeScreen() {
       </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Model Loading Test</ThemedText>
+        <ThemedText>
+          Test TensorFlow Lite model loading and GPU acceleration.
+        </ThemedText>
+        <Link href="/model-test" asChild>
+          <TouchableOpacity style={styles.testButton}>
+            <ThemedText style={styles.buttonText}>🤖 Test Model Loading</ThemedText>
+          </TouchableOpacity>
+        </Link>
+      </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Basic Worklet Test</ThemedText>
+        <ThemedText>
+          Test if worklets are functioning properly.
+        </ThemedText>
+        <Link href="/simple-test" asChild>
+          <TouchableOpacity style={styles.testButton}>
+            <ThemedText style={styles.buttonText}>🔧 Test Worklets</ThemedText>
+          </TouchableOpacity>
+        </Link>
+      </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Image Preprocessing Test</ThemedText>
+        <ThemedText>
+          Test camera frame preprocessing with real-time performance metrics.
+        </ThemedText>
+        <Link href="/preprocessing-test" asChild>
+          <TouchableOpacity style={styles.preprocessButton}>
+            <ThemedText style={styles.buttonText}>📷 Test Preprocessing</ThemedText>
+          </TouchableOpacity>
+        </Link>
+      </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Camera Permission Test</ThemedText>
         <ThemedText>
           This demonstrates the runtime permission handling system for camera access.
@@ -90,6 +127,20 @@ const styles = StyleSheet.create({
   },
   permissionButton: {
     backgroundColor: '#007AFF',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  testButton: {
+    backgroundColor: '#34C759',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  preprocessButton: {
+    backgroundColor: '#FF9500',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

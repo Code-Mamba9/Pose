@@ -1,39 +1,27 @@
-import { TensorflowModel } from 'react-native-fast-tflite';
-
-export interface MoveNetModel {
-  model: TensorflowModel;
-  inputSize: number;
-  outputShape: [number, number, number, number]; // [1, 1, 17, 3]
-}
+import { ModelManager, ModelConfig } from '../services/ModelManager';
 
 /**
- * Loads the MoveNet Lightning model for pose detection
+ * MoveNet Lightning model configuration for pose detection
  * Model specs:
- * - Input: [1, 192, 192, 3] (RGB image)
+ * - Input: [1, 192, 192, 3] (RGB image)  
  * - Output: [1, 1, 17, 3] (17 keypoints with y, x, confidence)
  * - Keypoints: nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles
  */
-export async function loadMoveNetModel(): Promise<MoveNetModel> {
-  try {
-    // Load the MoveNet Lightning Float16 model from assets
-    // For React Native, use require() to resolve the asset path
-    const modelAsset = require('../../assets/models/movenet_lightning_f16.tflite');
-    
-    const model = await TensorflowModel.create({
-      model: modelAsset,
-      // Enable GPU acceleration (will fall back to CPU if GPU unavailable)
-      delegates: ['gpu'],
-    });
+export const MOVENET_CONFIG: ModelConfig = {
+  modelPath: require('../../assets/models/movenet_lightning_f16.tflite'),
+  enableGPU: true,
+  inputSize: 192,
+  outputShape: [1, 1, 17, 3],
+};
 
-    return {
-      model,
-      inputSize: 192,
-      outputShape: [1, 1, 17, 3],
-    };
-  } catch (error) {
-    console.error('Failed to load MoveNet model:', error);
-    throw new Error(`MoveNet model loading failed: ${error}`);
-  }
+/**
+ * Create and initialize a MoveNet model manager
+ * @deprecated Use ModelManager directly or useModelManager hook instead
+ */
+export async function loadMoveNetModel(): Promise<ModelManager> {
+  const modelManager = new ModelManager();
+  await modelManager.initialize(MOVENET_CONFIG);
+  return modelManager;
 }
 
 /**
