@@ -1,5 +1,7 @@
-import { resize } from 'vision-camera-resize-plugin';
 import type { Frame } from 'react-native-vision-camera';
+
+// Note: This preprocessor requires vision-camera-resize-plugin to be used 
+// through the useResizePlugin hook in the component that uses it
 
 export interface PreprocessingConfig {
   inputSize: number;
@@ -7,6 +9,15 @@ export interface PreprocessingConfig {
   outputFormat: 'uint8' | 'float32';
   normalizeValues: boolean;
 }
+
+export interface ResizeOptions {
+  scale: { width: number; height: number };
+  pixelFormat: 'rgb' | 'rgba' | 'argb';
+  dataType: 'uint8' | 'float32';
+  crop?: { x: number; y: number; width: number; height: number };
+}
+
+export type ResizeFunction = (frame: Frame, options: ResizeOptions) => ArrayBuffer;
 
 export interface PreprocessingResult {
   data: Uint8Array | Float32Array;
@@ -22,9 +33,11 @@ export interface PreprocessingResult {
  */
 export class ImagePreprocessor {
   private config: PreprocessingConfig;
+  private resizeFunc: ResizeFunction;
 
-  constructor(config: PreprocessingConfig) {
+  constructor(config: PreprocessingConfig, resizeFunc: ResizeFunction) {
     this.config = config;
+    this.resizeFunc = resizeFunc;
   }
 
   /**
@@ -50,7 +63,7 @@ export class ImagePreprocessor {
 
       // Hardware-accelerated resize and format conversion
       console.log('Calling resize function...');
-      const resized = resize(frame, {
+      const resizedBuffer = this.resizeFunc(frame, {
         scale: {
           width: targetWidth,
           height: targetHeight,
@@ -60,9 +73,9 @@ export class ImagePreprocessor {
         crop: cropConfig,
       });
       
-      console.log('Resize completed, result length:', resized?.length);
+      console.log('Resize completed, result length:', resizedBuffer?.byteLength);
       
-      if (!resized) {
+      if (!resizedBuffer) {
         throw new Error('Resize function returned null/undefined');
       }
 
@@ -70,7 +83,7 @@ export class ImagePreprocessor {
       let processedData: Uint8Array | Float32Array;
       
       if (this.config.outputFormat === 'uint8') {
-        processedData = new Uint8Array(resized);
+        processedData = new Uint8Array(resizedBuffer);
         
         // Optional normalization for uint8 (typically not needed for MoveNet)
         if (this.config.normalizeValues) {
@@ -78,7 +91,7 @@ export class ImagePreprocessor {
         }
       } else {
         // Already float32 from resize plugin
-        processedData = new Float32Array(resized);
+        processedData = new Float32Array(resizedBuffer);
       }
 
       const processingTime = Date.now() - startTime;
@@ -201,7 +214,8 @@ export const MOVENET_PREPROCESSING_CONFIG: PreprocessingConfig = {
 
 /**
  * Create a preprocessor instance with MoveNet defaults
+ * @param resizeFunc - The resize function from useResizePlugin() hook
  */
-export function createMoveNetPreprocessor(): ImagePreprocessor {
-  return new ImagePreprocessor(MOVENET_PREPROCESSING_CONFIG);
+export function createMoveNetPreprocessor(resizeFunc: ResizeFunction): ImagePreprocessor {
+  return new ImagePreprocessor(MOVENET_PREPROCESSING_CONFIG, resizeFunc);
 }
