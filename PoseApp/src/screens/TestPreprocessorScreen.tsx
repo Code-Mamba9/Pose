@@ -5,6 +5,7 @@ import { ImagePreprocessorDemo } from '../components/ImagePreprocessorDemo';
 
 export const TestPreprocessorScreen: React.FC = () => {
   const [useFallback, setUseFallback] = useState(false);
+  const [useOptimized, setUseOptimized] = useState(true);
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
 
@@ -33,17 +34,29 @@ export const TestPreprocessorScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.controls}>
-        <Text style={styles.label}>
-          Mode: {useFallback ? 'Fallback (YUV→RGB)' : 'Plugin (Hardware)'}
-        </Text>
-        <Switch
-          value={useFallback}
-          onValueChange={setUseFallback}
-        />
+        <View style={styles.controlRow}>
+          <Text style={styles.label}>
+            Mode: {useFallback ? 'Fallback (YUV→RGB)' : 'Plugin (Hardware)'}
+          </Text>
+          <Switch
+            value={useFallback}
+            onValueChange={setUseFallback}
+          />
+        </View>
+        <View style={styles.controlRow}>
+          <Text style={styles.label}>
+            Algorithm: {useOptimized ? 'Optimized' : 'Standard'}
+          </Text>
+          <Switch
+            value={useOptimized}
+            onValueChange={setUseOptimized}
+          />
+        </View>
       </View>
       
       <ImagePreprocessorDemo 
         useFallback={useFallback}
+        useOptimized={useOptimized}
         device={device}
       />
     </View>
@@ -61,12 +74,15 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     zIndex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     padding: 16,
     borderRadius: 8,
+  },
+  controlRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginVertical: 4,
   },
   label: {
     color: 'white',

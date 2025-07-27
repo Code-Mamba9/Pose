@@ -2,9 +2,11 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Camera, useFrameProcessor, type Frame, type CameraDevice } from 'react-native-vision-camera';
 import { preprocessFrame, MOVENET_PREPROCESSING_CONFIG } from '../services/ImagePreprocessorFunctions';
+import { preprocessFrameOptimized } from '../services/ImagePreprocessorOptimized';
 
 interface ImagePreprocessorDemoProps {
   useFallback?: boolean; // Option to test fallback processing
+  useOptimized?: boolean; // Option to test optimized version
   device: CameraDevice;
 }
 
@@ -14,6 +16,7 @@ interface ImagePreprocessorDemoProps {
  */
 export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({ 
   useFallback = true, // Default to fallback since plugin may not be available
+  useOptimized = true, // Default to optimized version for better performance
   device
 }) => {
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -40,9 +43,11 @@ export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({
         throw new Error('frame.toArrayBuffer() returned null/undefined');
       }
       
-      // Preprocess the frame for MoveNet using function approach
-      console.log('Calling preprocessFrame function...');
-      const result = preprocessFrame(frame, MOVENET_PREPROCESSING_CONFIG);
+      // Preprocess the frame for MoveNet using optimized or standard approach
+      console.log(`Calling ${useOptimized ? 'optimized' : 'standard'} preprocessFrame function...`);
+      const result = useOptimized 
+        ? preprocessFrameOptimized(frame, MOVENET_PREPROCESSING_CONFIG)
+        : preprocessFrame(frame, MOVENET_PREPROCESSING_CONFIG);
       
       console.log('Preprocessing completed:', {
         width: result.width,
