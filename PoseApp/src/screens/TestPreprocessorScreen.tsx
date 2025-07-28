@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, Switch, Alert, TouchableOpacity } from 'react-native';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { ImagePreprocessorDemo } from '../components/ImagePreprocessorDemo';
 
 export const TestPreprocessorScreen: React.FC = () => {
   const [useFallback, setUseFallback] = useState(false);
   const [useOptimized, setUseOptimized] = useState(true);
+  const [enablePoseDetection, setEnablePoseDetection] = useState(false);
+  const [mockScenario, setMockScenario] = useState<'standing' | 'sitting' | 'partial' | 'low_confidence'>('standing');
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
 
@@ -52,12 +54,47 @@ export const TestPreprocessorScreen: React.FC = () => {
             onValueChange={setUseOptimized}
           />
         </View>
+        <View style={styles.controlRow}>
+          <Text style={styles.label}>
+            Pipeline: {enablePoseDetection ? 'Full (Preprocess + Pose)' : 'Preprocessing Only'}
+          </Text>
+          <Switch
+            value={enablePoseDetection}
+            onValueChange={setEnablePoseDetection}
+          />
+        </View>
+        {enablePoseDetection && (
+          <View style={styles.scenarioContainer}>
+            <Text style={styles.scenarioLabel}>Mock Pose Scenario:</Text>
+            <View style={styles.scenarioButtons}>
+              {(['standing', 'sitting', 'partial', 'low_confidence'] as const).map((scenario) => (
+                <TouchableOpacity
+                  key={scenario}
+                  style={[
+                    styles.scenarioButton,
+                    mockScenario === scenario && styles.activeScenarioButton
+                  ]}
+                  onPress={() => setMockScenario(scenario)}
+                >
+                  <Text style={[
+                    styles.scenarioButtonText,
+                    mockScenario === scenario && styles.activeScenarioButtonText
+                  ]}>
+                    {scenario.charAt(0).toUpperCase() + scenario.slice(1).replace('_', ' ')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
       
       <ImagePreprocessorDemo 
         useFallback={useFallback}
         useOptimized={useOptimized}
         device={device}
+        enablePoseDetection={enablePoseDetection}
+        mockScenario={mockScenario}
       />
     </View>
   );
@@ -87,5 +124,36 @@ const styles = StyleSheet.create({
   label: {
     color: 'white',
     fontSize: 16,
+  },
+  scenarioContainer: {
+    marginTop: 12,
+  },
+  scenarioLabel: {
+    color: 'white',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  scenarioButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  scenarioButton: {
+    backgroundColor: '#444',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    minWidth: 80,
+  },
+  activeScenarioButton: {
+    backgroundColor: '#007AFF',
+  },
+  scenarioButtonText: {
+    color: 'white',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  activeScenarioButtonText: {
+    fontWeight: '600',
   },
 });
