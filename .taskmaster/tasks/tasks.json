@@ -211,7 +211,7 @@
             "description": "Create the core frame processing pipeline that captures camera frames and prepares them for pose detection inference",
             "dependencies": [],
             "details": "Set up camera frame capture using react-native-vision-camera with optimized frame processor. Implement frame preprocessing including resize to 192x192 pixels, RGB format conversion, and tensor normalization (0-255 to 0-1 range). Create frame buffer management with circular buffer to handle frame drops gracefully. Implement adaptive frame sampling based on device performance to maintain target FPS.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test frame capture stability across different devices, verify preprocessing accuracy with known test frames, measure frame processing latency (target <5ms), and validate frame buffer behavior under high load conditions."
           },
           {
@@ -678,7 +678,7 @@
     ],
     "metadata": {
       "created": "2025-07-20T23:48:52.376Z",
-      "updated": "2025-07-28T01:33:55.518Z",
+      "updated": "2025-07-28T12:45:52.277Z",
       "description": "Tasks for master context"
     }
   }

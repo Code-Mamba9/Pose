@@ -60,17 +60,6 @@ export default function HomeScreen() {
         </Link>
       </ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Basic Worklet Test</ThemedText>
-        <ThemedText>
-          Test if worklets are functioning properly.
-        </ThemedText>
-        <Link href="/simple-test" asChild>
-          <TouchableOpacity style={styles.testButton}>
-            <ThemedText style={styles.buttonText}>🔧 Test Worklets</ThemedText>
-          </TouchableOpacity>
-        </Link>
-      </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Image Preprocessing Test</ThemedText>
@@ -99,9 +88,9 @@ export default function HomeScreen() {
       </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Next Steps</ThemedText>
+        <ThemedText type="subtitle">Advanced Testing</ThemedText>
         <ThemedText>
-          With camera permissions configured, we can now implement the camera preview component (Task 2.3).
+          For comprehensive testing, use the dedicated tabs: Explore (full pipeline), Test (preprocessing comparison), and Keypoints (ML output validation).
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
