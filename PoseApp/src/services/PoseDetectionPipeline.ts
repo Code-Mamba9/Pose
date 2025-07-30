@@ -40,7 +40,7 @@ export const DEFAULT_PIPELINE_CONFIG: PoseDetectionConfig = {
   preprocessingConfig: MOVENET_PREPROCESSING_CONFIG,
   keypointConfig: {
     ...DEFAULT_KEYPOINT_CONFIG,
-    confidenceThreshold: 0.3,
+    confidenceThreshold: 0.1,
     screenWidth: 192,
     screenHeight: 192,
   },
@@ -61,47 +61,18 @@ export function processPoseDetection(
   const totalStartTime = Date.now();
   
   try {
-    console.log('=== Pose Detection Pipeline Start ===');
-    console.log('Frame input:', {
-      width: frame.width,
-      height: frame.height,
-      pixelFormat: frame.pixelFormat
-    });
-    
-    console.log('Pipeline config:', {
-      useOptimizedPreprocessing: config.useOptimizedPreprocessing,
-      enableMockMode: config.enableMockMode,
-      mockScenario: config.mockScenario,
-      confidenceThreshold: config.keypointConfig.confidenceThreshold
-    });
-    
     // Step 1: Preprocess the camera frame
-    console.log('Step 1: Preprocessing frame...');
     const preprocessingResult = config.useOptimizedPreprocessing
       ? preprocessFrameOptimized(frame, config.preprocessingConfig)
       : preprocessFrame(frame, config.preprocessingConfig);
     
-    console.log('Preprocessing completed:', {
-      outputWidth: preprocessingResult.width,
-      outputHeight: preprocessingResult.height,
-      channels: preprocessingResult.channels,
-      dataType: preprocessingResult.data?.constructor?.name || 'Unknown',
-      dataLength: preprocessingResult.data.length,
-      processingTime: preprocessingResult.processingTime
-    });
-    
     // Step 2: Run model inference (real TensorFlow Lite or mock)
-    console.log('Step 2: Running model inference...');
     let modelOutput: Float32Array;
     
     if (config.enableMockMode) {
-      // Use mock data for testing
       modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
-      console.log('Using mock model output for testing');
     } else if (config.model) {
       try {
-        // Real TensorFlow Lite inference
-        console.log('Running real TensorFlow Lite inference...');
         const modelOutputs = config.model.runSync([preprocessingResult.data]);
         
         if (!modelOutputs || modelOutputs.length === 0) {
@@ -109,28 +80,16 @@ export function processPoseDetection(
         }
         
         modelOutput = modelOutputs[0];
-        console.log('Real TensorFlow Lite inference completed:', {
-          outputLength: modelOutput.length,
-          outputType: modelOutput?.constructor?.name || 'Unknown'
-        });
         
       } catch (inferenceError) {
         console.warn('Real inference failed, falling back to mock:', inferenceError);
         modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
       }
     } else {
-      // No model available, use mock data
-      console.log('No model available, using mock output');
       modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
     }
     
-    console.log('Model inference completed:', {
-      outputLength: modelOutput.length,
-      outputType: modelOutput?.constructor?.name || 'Unknown'
-    });
-    
     // Step 3: Extract keypoints from model output
-    console.log('Step 3: Extracting keypoints...');
     const updatedKeypointConfig: KeypointExtractionConfig = {
       ...config.keypointConfig,
       screenWidth: frame.width,  // Use actual frame dimensions
@@ -139,22 +98,9 @@ export function processPoseDetection(
     
     const poseDetectionResult = extractPoseKeypoints(modelOutput, updatedKeypointConfig);
     
-    console.log('Keypoint extraction completed:', {
-      overallConfidence: poseDetectionResult.overallConfidence.toFixed(3),
-      validKeypoints: poseDetectionResult.validKeypoints,
-      totalKeypoints: 17,
-      processingTime: poseDetectionResult.processingTime
-    });
-    
     const totalProcessingTime = Date.now() - totalStartTime;
     
-    console.log('=== Pipeline Completed ===');
-    console.log('Total processing time:', totalProcessingTime, 'ms');
-    console.log('Performance breakdown:', {
-      preprocessing: `${preprocessingResult.processingTime}ms (${((preprocessingResult.processingTime / totalProcessingTime) * 100).toFixed(1)}%)`,
-      keypoint_extraction: `${poseDetectionResult.processingTime}ms (${((poseDetectionResult.processingTime / totalProcessingTime) * 100).toFixed(1)}%)`,
-      total: `${totalProcessingTime}ms`
-    });
+    console.log(`Pipeline: ${totalProcessingTime}ms (prep: ${preprocessingResult.processingTime}ms, conf: ${(poseDetectionResult.overallConfidence * 100).toFixed(1)}%, valid: ${poseDetectionResult.validKeypoints}/17)`);
     
     return {
       preprocessing: preprocessingResult,
@@ -167,9 +113,7 @@ export function processPoseDetection(
     const totalProcessingTime = Date.now() - totalStartTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown pipeline error';
     
-    console.error('=== Pipeline Failed ===');
-    console.error('Error:', errorMessage);
-    console.error('Processing time before failure:', totalProcessingTime, 'ms');
+    console.error('Pipeline failed:', errorMessage, `(${totalProcessingTime}ms)`);
     
     // Return a failed result with default values
     return {

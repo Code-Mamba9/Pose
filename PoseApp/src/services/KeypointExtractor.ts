@@ -268,13 +268,6 @@ export function extractPoseKeypoints(
   const startTime = Date.now();
   
   try {
-    console.log('Extracting keypoints from model output:', {
-      outputLength: modelOutput.length,
-      expectedLength: 51, // 1 * 1 * 17 * 3
-      confidenceThreshold: config.confidenceThreshold,
-      modelOutputType: Object.prototype.toString.call(modelOutput),
-      firstFewValues: modelOutput.length > 0 ? Array.from(modelOutput.slice(0, 6)) : 'No values'
-    });
     
     // Validate tensor shape
     if (modelOutput.length !== 51) {
@@ -329,19 +322,26 @@ export function extractPoseKeypoints(
     
     const processingTime = Date.now() - startTime;
     
-    console.log('Keypoint extraction completed:', {
-      overallConfidence: overallConfidence.toFixed(3),
-      validKeypoints,
-      totalKeypoints: 17,
-      processingTime,
-      highConfidenceKeypoints: countValidKeypoints(keypoints, 0.7)
-    });
     
-    // Log some sample keypoints for debugging
-    console.log('Sample keypoints:', {
+    // Log all keypoints for debugging
+    console.log('All keypoints:', {
       nose: `(${keypoints.nose.x.toFixed(3)}, ${keypoints.nose.y.toFixed(3)}) conf: ${keypoints.nose.confidence.toFixed(3)}`,
+      leftEye: `(${keypoints.leftEye.x.toFixed(3)}, ${keypoints.leftEye.y.toFixed(3)}) conf: ${keypoints.leftEye.confidence.toFixed(3)}`,
+      rightEye: `(${keypoints.rightEye.x.toFixed(3)}, ${keypoints.rightEye.y.toFixed(3)}) conf: ${keypoints.rightEye.confidence.toFixed(3)}`,
+      leftEar: `(${keypoints.leftEar.x.toFixed(3)}, ${keypoints.leftEar.y.toFixed(3)}) conf: ${keypoints.leftEar.confidence.toFixed(3)}`,
+      rightEar: `(${keypoints.rightEar.x.toFixed(3)}, ${keypoints.rightEar.y.toFixed(3)}) conf: ${keypoints.rightEar.confidence.toFixed(3)}`,
       leftShoulder: `(${keypoints.leftShoulder.x.toFixed(3)}, ${keypoints.leftShoulder.y.toFixed(3)}) conf: ${keypoints.leftShoulder.confidence.toFixed(3)}`,
-      rightShoulder: `(${keypoints.rightShoulder.x.toFixed(3)}, ${keypoints.rightShoulder.y.toFixed(3)}) conf: ${keypoints.rightShoulder.confidence.toFixed(3)}`
+      rightShoulder: `(${keypoints.rightShoulder.x.toFixed(3)}, ${keypoints.rightShoulder.y.toFixed(3)}) conf: ${keypoints.rightShoulder.confidence.toFixed(3)}`,
+      leftElbow: `(${keypoints.leftElbow.x.toFixed(3)}, ${keypoints.leftElbow.y.toFixed(3)}) conf: ${keypoints.leftElbow.confidence.toFixed(3)}`,
+      rightElbow: `(${keypoints.rightElbow.x.toFixed(3)}, ${keypoints.rightElbow.y.toFixed(3)}) conf: ${keypoints.rightElbow.confidence.toFixed(3)}`,
+      leftWrist: `(${keypoints.leftWrist.x.toFixed(3)}, ${keypoints.leftWrist.y.toFixed(3)}) conf: ${keypoints.leftWrist.confidence.toFixed(3)}`,
+      rightWrist: `(${keypoints.rightWrist.x.toFixed(3)}, ${keypoints.rightWrist.y.toFixed(3)}) conf: ${keypoints.rightWrist.confidence.toFixed(3)}`,
+      leftHip: `(${keypoints.leftHip.x.toFixed(3)}, ${keypoints.leftHip.y.toFixed(3)}) conf: ${keypoints.leftHip.confidence.toFixed(3)}`,
+      rightHip: `(${keypoints.rightHip.x.toFixed(3)}, ${keypoints.rightHip.y.toFixed(3)}) conf: ${keypoints.rightHip.confidence.toFixed(3)}`,
+      leftKnee: `(${keypoints.leftKnee.x.toFixed(3)}, ${keypoints.leftKnee.y.toFixed(3)}) conf: ${keypoints.leftKnee.confidence.toFixed(3)}`,
+      rightKnee: `(${keypoints.rightKnee.x.toFixed(3)}, ${keypoints.rightKnee.y.toFixed(3)}) conf: ${keypoints.rightKnee.confidence.toFixed(3)}`,
+      leftAnkle: `(${keypoints.leftAnkle.x.toFixed(3)}, ${keypoints.leftAnkle.y.toFixed(3)}) conf: ${keypoints.leftAnkle.confidence.toFixed(3)}`,
+      rightAnkle: `(${keypoints.rightAnkle.x.toFixed(3)}, ${keypoints.rightAnkle.y.toFixed(3)}) conf: ${keypoints.rightAnkle.confidence.toFixed(3)}`
     });
     
     return {
