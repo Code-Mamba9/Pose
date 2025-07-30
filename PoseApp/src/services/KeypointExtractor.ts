@@ -271,7 +271,9 @@ export function extractPoseKeypoints(
     console.log('Extracting keypoints from model output:', {
       outputLength: modelOutput.length,
       expectedLength: 51, // 1 * 1 * 17 * 3
-      confidenceThreshold: config.confidenceThreshold
+      confidenceThreshold: config.confidenceThreshold,
+      modelOutputType: Object.prototype.toString.call(modelOutput),
+      firstFewValues: modelOutput.length > 0 ? Array.from(modelOutput.slice(0, 6)) : 'No values'
     });
     
     // Validate tensor shape
@@ -353,8 +355,15 @@ export function extractPoseKeypoints(
     };
     
   } catch (error) {
-    console.error('Keypoint extraction failed:', error);
-    throw new Error(`Keypoint extraction error: ${error.message}`);
+    console.error('Keypoint extraction failed - detailed error:', {
+      error: error,
+      errorType: Object.prototype.toString.call(error),
+      message: error instanceof Error ? error.message : 'No message',
+      stack: error instanceof Error ? error.stack : 'No stack',
+      name: error instanceof Error ? error.name : 'No name'
+    });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Keypoint extraction error: ${errorMessage}`);
   }
 }
 

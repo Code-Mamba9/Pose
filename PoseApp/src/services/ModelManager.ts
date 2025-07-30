@@ -26,6 +26,9 @@ export type ModelDelegate = 'gpu' | 'core-ml' | 'nnapi' | 'cpu';
  * - Performance metrics tracking
  */
 export class ModelManager {
+  // Mark as Worklet Context Object to allow cross-thread access with ArrayBuffers
+  __workletContextObject = true;
+  
   private model: TensorflowModel | null = null;
   private isLoading = false;
   private isInitialized = false;
@@ -38,6 +41,8 @@ export class ModelManager {
 
   constructor() {
     this.model = null;
+    // Ensure the worklet context object property is set
+    this.__workletContextObject = true;
   }
 
   /**
@@ -66,7 +71,21 @@ export class ModelManager {
       console.log(`Loading model with ${delegate} delegate...`);
       
       // Load model with primary delegate
+      console.log('Loading TensorFlow Lite model with config:', {
+        modelPath: config.modelPath,
+        delegate: delegate,
+        enableGPU: config.enableGPU,
+        inputSize: config.inputSize,
+        outputShape: config.outputShape
+      });
+      
       this.model = await this.loadModelWithDelegate(config.modelPath, delegate);
+      
+      console.log('Model loaded successfully:', {
+        model: !!this.model,
+        modelType: Object.prototype.toString.call(this.model),
+        hasRunSync: typeof this.model?.runSync === 'function'
+      });
       
       // Pre-allocate memory buffers
       this.initializeBuffers(config);
@@ -95,27 +114,99 @@ export class ModelManager {
 
   /**
    * Run inference with memory-optimized buffer reuse
+   * This method is workletized to be callable from frame processors
    */
-  runInference(inputData: Uint8Array | Float32Array): Float32Array[] {
+  runInference(inputData: Uint8Array | Float32Array): Float32Array {
+    'worklet';
     if (!this.model || !this.isInitialized) {
       throw new Error('Model not initialized. Call initialize() first.');
     }
 
     try {
+      // Debug input data type and properties
+      console.log('ModelManager.runInference input validation:', {
+        dataType: Object.prototype.toString.call(inputData),
+        constructor: inputData?.constructor?.name,
+        isUint8Array: inputData instanceof Uint8Array,
+        isFloat32Array: inputData instanceof Float32Array,
+        length: inputData?.length
+      });
+
       // Validate input data
       if (!(inputData instanceof Uint8Array) && !(inputData instanceof Float32Array)) {
-        throw new Error('Input data must be a Uint8Array or Float32Array');
+        throw new Error(`Input data must be a Uint8Array or Float32Array, received: ${Object.prototype.toString.call(inputData)}`);
       }
 
       // Run synchronous inference directly with the TypedArray
       const outputs = this.model.runSync([inputData]);
       
-      // Convert outputs to Float32Array for easier handling
-      return outputs.map(output => new Float32Array(output));
+      console.log('TensorFlow Lite model outputs:', {
+        numOutputs: outputs.length,
+        outputShapes: outputs.map((output, i) => ({
+          index: i,
+          length: output.length,
+          type: Object.prototype.toString.call(output)
+        }))
+      });
+      
+      // For MoveNet, we typically only need the first output tensor
+      if (outputs.length === 0) {
+        throw new Error('Model returned no outputs');
+      }
+      
+      // Convert first output to Float32Array for easier handling
+      const firstOutput = outputs[0];
+      let finalOutput: Float32Array;
+      
+      if (!(firstOutput instanceof Float32Array)) {
+        console.log('Converting non-Float32Array output to Float32Array:', {
+          originalType: firstOutput?.constructor?.name || 'Unknown',
+          originalLength: firstOutput?.length
+        });
+        finalOutput = new Float32Array(firstOutput);
+      } else {
+        finalOutput = firstOutput;
+      }
+
+      // Detailed debugging of the final output
+      console.log('Final ModelManager output before return:', {
+        length: finalOutput.length,
+        type: finalOutput?.constructor?.name || 'Unknown',
+        isFloat32Array: finalOutput instanceof Float32Array,
+        hasValues: finalOutput.length > 0,
+        firstFewValues: finalOutput.length > 0 ? [finalOutput[0], finalOutput[1], finalOutput[2]] : 'No values',
+        isIterable: typeof finalOutput[Symbol.iterator] === 'function',
+        canArrayFrom: (() => {
+          try {
+            const testArray = Array.from(finalOutput);
+            return {
+              success: true,
+              testArrayType: testArray?.constructor?.name || 'Unknown',
+              testArrayLength: testArray.length,
+              testArrayFirstValues: testArray.length > 0 ? testArray.slice(0, 3) : 'No values'
+            };
+          } catch (testError) {
+            return {
+              success: false,
+              error: testError.message
+            };
+          }
+        })()
+      });
+
+      return finalOutput;
       
     } catch (error) {
-      console.error('Inference failed:', error);
-      throw new Error(`Inference failed: ${error}`);
+      console.error('Inference failed - detailed error:', {
+        error: error,
+        errorType: Object.prototype.toString.call(error),
+        message: error instanceof Error ? error.message : 'No message',
+        stack: error instanceof Error ? error.stack : 'No stack',
+        name: error instanceof Error ? error.name : 'No name',
+        errorKeys: error ? Object.keys(error) : 'No keys'
+      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Inference failed: ${errorMessage}`);
     }
   }
 

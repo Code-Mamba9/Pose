@@ -104,7 +104,7 @@ export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({
           width: result.width,
           height: result.height,
           channels: result.channels,
-          dataType: result.data.constructor.name,
+          dataType: result.data?.constructor?.name || 'Unknown',
           dataLength: result.data.length,
           processingTime: result.processingTime
         });

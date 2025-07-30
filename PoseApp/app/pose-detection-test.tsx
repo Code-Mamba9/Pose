@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { CameraView } from '@/components/CameraView';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { usePoseDetectionFrameProcessor } from '@/utils/frameProcessor';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import { useTensorflowModel } from 'react-native-fast-tflite';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -20,6 +20,9 @@ export default function PoseDetectionTestScreen() {
   const [bufferStats, setBufferStats] = useState<any>(null);
   const [smoothKeypoints, setSmoothKeypoints] = useState<any>(null);
   
+  // Initialize TensorFlow Lite model using official hook
+  const model = useTensorflowModel(require('../assets/models/movenet_lightning_f16.tflite'));
+  
   const cameraRef = useRef<Camera>(null);
   const metricsInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -27,14 +30,16 @@ export default function PoseDetectionTestScreen() {
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
 
-  // Initialize pose detection frame processor with current config
+  // Initialize pose detection frame processor with current config and model
   const {
     frameProcessor,
     getLatestPoseData,
     getBufferStats,
-    getSmoothKeypoints,
-    sharedValues
-  } = usePoseDetectionFrameProcessor(configSettings);
+    getSmoothKeypoints
+  } = usePoseDetectionFrameProcessor({
+    ...configSettings,
+    model: model.state === 'loaded' ? model.model : undefined // Pass loaded model directly
+  });
 
   // Update metrics every second
   useEffect(() => {
@@ -60,7 +65,8 @@ export default function PoseDetectionTestScreen() {
   const handleCameraReady = useCallback(() => {
     console.log('Camera ready for pose detection');
     setIsReady(true);
-  }, []);
+    console.log('Model state:', model.state);
+  }, [model.state]);
 
   const handleCameraError = useCallback((error: any) => {
     console.error('Camera error:', error);
@@ -77,6 +83,17 @@ export default function PoseDetectionTestScreen() {
   const renderConfigControls = () => (
     <View style={styles.configSection}>
       <ThemedText style={styles.sectionTitle}>Configuration</ThemedText>
+      
+      {/* Model Status */}
+      <View style={styles.controlRow}>
+        <ThemedText style={styles.controlLabel}>TensorFlow Lite Model</ThemedText>
+        <ThemedText style={[
+          styles.metricValue,
+          { color: model.state === 'loaded' ? '#4CAF50' : model.state === 'loading' ? '#FF9800' : model.state === 'error' ? '#FF5722' : '#666' }
+        ]}>
+          {model.state === 'loading' ? 'Loading...' : model.state === 'loaded' ? 'Ready' : model.state === 'error' ? 'Failed' : 'Not Loaded'}
+        </ThemedText>
+      </View>
       
       <View style={styles.controlRow}>
         <ThemedText style={styles.controlLabel}>Real-time Inference</ThemedText>

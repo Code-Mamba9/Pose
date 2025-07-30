@@ -1,6 +1,7 @@
 import { useFrameProcessor, runAtTargetFps, runAsync } from 'react-native-vision-camera';
 import { useSharedValue } from 'react-native-reanimated';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { Worklets } from 'react-native-worklets-core';
 import { useFrameMemoryManager, CPULoadMonitor, MemoryStats } from './memoryManager';
 import { useFrameProcessorErrorRecovery, FrameProcessingError, RecoveryStrategy } from './errorRecovery';
 import { processPoseDetection, DEFAULT_PIPELINE_CONFIG } from '../src/services/PoseDetectionPipeline';
@@ -250,8 +251,11 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
     enableAdaptiveSampling = true,
     targetFps = 25,
     confidenceThreshold = 0.3,
-    maxBufferSize = 10
+    maxBufferSize = 10,
+    model = null // TensorFlow Lite model for direct inference
   } = config;
+
+  // No runOnJS needed anymore - we'll pass modelManager directly to the worklet
 
   // Shared values for pose detection metrics
   const frameCount = useSharedValue(0);
@@ -282,40 +286,44 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
       }
 
       if (enableRealTimeInference) {
-        // 🚀 REAL POSE DETECTION using existing PoseDetectionPipeline
-        // This now uses the comprehensive preprocessing and keypoint extraction pipeline
+        // 🚀 REAL POSE DETECTION using complete pipeline with TensorFlow Lite Model
         
         let simulatedKeypoints: any[];
         let confidence: number;
         let processingTime: number;
         
         try {
-          // Use the existing comprehensive pipeline for real pose detection
+          // Use the complete pipeline with real model inference
           const pipelineResult = processPoseDetection(frame, {
             ...DEFAULT_PIPELINE_CONFIG,
             useOptimizedPreprocessing: true,
-            enableMockMode: true, // Still using mock model inference until TFLite model is loaded
-            mockScenario: 'standing'
+            enableMockMode: !model, // Use mock only if no model available
+            mockScenario: 'standing',
+            model: model // Pass the real model for inference
           });
           
           if (!pipelineResult.success) {
-            console.warn('[FrameProcessor] Pipeline failed:', pipelineResult.error);
-            return;
+            throw new Error('Pipeline failed: ' + pipelineResult.error);
           }
           
           // Extract keypoints from pipeline result and convert to expected format
           const pipelineKeypoints = pipelineResult.poseDetection.keypoints;
-          simulatedKeypoints = Object.keys(pipelineKeypoints).map(keypointName => ({
-            x: pipelineKeypoints[keypointName].x,
-            y: pipelineKeypoints[keypointName].y,
-            confidence: pipelineKeypoints[keypointName].confidence,
-            name: keypointName
-          }));
+          simulatedKeypoints = Object.keys(pipelineKeypoints)
+            .filter(keypointName => pipelineKeypoints[keypointName] != null)
+            .map(keypointName => {
+              const keypoint = pipelineKeypoints[keypointName];
+              return {
+                x: keypoint.x * frame.width, // Convert normalized to screen coordinates
+                y: keypoint.y * frame.height,
+                confidence: keypoint.confidence,
+                name: keypointName
+              };
+            });
 
           confidence = pipelineResult.poseDetection.overallConfidence;
           processingTime = pipelineResult.totalProcessingTime;
           
-          console.log(`🔍 [FrameProcessor] Real pipeline processed ${simulatedKeypoints.length} keypoints, confidence: ${(confidence * 100).toFixed(1)}%`);
+          console.log(`🔍 [FrameProcessor] ${model ? 'Real' : 'Mock'} inference: ${simulatedKeypoints.length} keypoints, confidence: ${(confidence * 100).toFixed(1)}%`);
           
         } catch (pipelineError) {
           console.error('❌ [FrameProcessor] Pipeline error:', pipelineError);

@@ -18,6 +18,7 @@ export interface PoseDetectionConfig {
   keypointConfig: KeypointExtractionConfig;
   enableMockMode: boolean; // For testing without actual model inference
   mockScenario?: 'standing' | 'sitting' | 'partial' | 'low_confidence';
+  model?: any; // TensorFlow Lite model for real inference
 }
 
 /**
@@ -46,28 +47,7 @@ export const DEFAULT_PIPELINE_CONFIG: PoseDetectionConfig = {
   enableMockMode: false,
 };
 
-/**
- * Simulate TensorFlow Lite model inference with mock data
- * In production, this would be replaced with actual TFLite model execution
- */
-function simulateModelInference(
-  preprocessedData: Uint8Array | Float32Array,
-  mockScenario: 'standing' | 'sitting' | 'partial' | 'low_confidence' = 'standing'
-): Float32Array {
-  'worklet';
-  
-  console.log('Simulating model inference...', {
-    inputDataLength: preprocessedData.length,
-    inputDataType: preprocessedData.constructor.name,
-    mockScenario
-  });
-  
-  // In a real implementation, this would be:
-  // return tfliteModel.run(preprocessedData);
-  
-  // For testing, return mock MoveNet output
-  return generateMockMoveNetOutput(mockScenario);
-}
+
 
 /**
  * Complete pose detection pipeline from camera frame to keypoints
@@ -105,20 +85,48 @@ export function processPoseDetection(
       outputWidth: preprocessingResult.width,
       outputHeight: preprocessingResult.height,
       channels: preprocessingResult.channels,
-      dataType: preprocessingResult.data.constructor.name,
+      dataType: preprocessingResult.data?.constructor?.name || 'Unknown',
       dataLength: preprocessingResult.data.length,
       processingTime: preprocessingResult.processingTime
     });
     
-    // Step 2: Run model inference (simulated for now)
+    // Step 2: Run model inference (real TensorFlow Lite or mock)
     console.log('Step 2: Running model inference...');
-    const modelOutput = config.enableMockMode
-      ? generateMockMoveNetOutput(config.mockScenario || 'standing')
-      : simulateModelInference(preprocessingResult.data, config.mockScenario || 'standing');
+    let modelOutput: Float32Array;
+    
+    if (config.enableMockMode) {
+      // Use mock data for testing
+      modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
+      console.log('Using mock model output for testing');
+    } else if (config.model) {
+      try {
+        // Real TensorFlow Lite inference
+        console.log('Running real TensorFlow Lite inference...');
+        const modelOutputs = config.model.runSync([preprocessingResult.data]);
+        
+        if (!modelOutputs || modelOutputs.length === 0) {
+          throw new Error('Model returned no outputs');
+        }
+        
+        modelOutput = modelOutputs[0];
+        console.log('Real TensorFlow Lite inference completed:', {
+          outputLength: modelOutput.length,
+          outputType: modelOutput?.constructor?.name || 'Unknown'
+        });
+        
+      } catch (inferenceError) {
+        console.warn('Real inference failed, falling back to mock:', inferenceError);
+        modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
+      }
+    } else {
+      // No model available, use mock data
+      console.log('No model available, using mock output');
+      modelOutput = generateMockMoveNetOutput(config.mockScenario || 'standing');
+    }
     
     console.log('Model inference completed:', {
       outputLength: modelOutput.length,
-      outputType: modelOutput.constructor.name
+      outputType: modelOutput?.constructor?.name || 'Unknown'
     });
     
     // Step 3: Extract keypoints from model output
