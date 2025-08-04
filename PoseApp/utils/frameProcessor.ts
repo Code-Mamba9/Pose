@@ -241,7 +241,7 @@ export const useBasicFrameProcessor = (logFrames: boolean = false) => {
 
 /**
  * Advanced pose detection frame processor with configuration and metrics
- * This matches the interface expected by pose-detection-test.tsx
+ * This matches the interface expected by PoseDetectionTestScreen.tsx
  * Supports both simple preparation mode and full inference mode
  */
 export const usePoseDetectionFrameProcessor = (config: any = {}) => {

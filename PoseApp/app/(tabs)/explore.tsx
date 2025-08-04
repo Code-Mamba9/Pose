@@ -1,1 +1,3 @@
-export { default } from '../pose-detection-test';
+import PoseDetectionTestScreen from '@/src/screens/PoseDetectionTestScreen';
+
+export default PoseDetectionTestScreen;

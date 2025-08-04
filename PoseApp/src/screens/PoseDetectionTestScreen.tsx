@@ -21,7 +21,7 @@ export default function PoseDetectionTestScreen() {
   const [smoothKeypoints, setSmoothKeypoints] = useState<any>(null);
   
   // Initialize TensorFlow Lite model using official hook
-  const model = useTensorflowModel(require('../assets/models/movenet_lightning_f16.tflite'));
+  const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
   
   const cameraRef = useRef<Camera>(null);
   const metricsInterval = useRef<NodeJS.Timeout | null>(null);
