@@ -61,17 +61,6 @@ export default function HomeScreen() {
       </ThemedView>
 
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Image Preprocessing Test</ThemedText>
-        <ThemedText>
-          Test camera frame preprocessing with real-time performance metrics.
-        </ThemedText>
-        <Link href="/preprocessing-test" asChild>
-          <TouchableOpacity style={styles.preprocessButton}>
-            <ThemedText style={styles.buttonText}>📷 Test Preprocessing</ThemedText>
-          </TouchableOpacity>
-        </Link>
-      </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Camera Permission Test</ThemedText>
@@ -123,13 +112,6 @@ const styles = StyleSheet.create({
   },
   testButton: {
     backgroundColor: '#34C759',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  preprocessButton: {
-    backgroundColor: '#FF9500',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

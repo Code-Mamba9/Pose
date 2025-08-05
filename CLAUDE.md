@@ -58,14 +58,12 @@ PoseApp/
 │   ├── (tabs)/                     # Tab-based routing
 │   │   ├── _layout.tsx             # Tab layout configuration
 │   │   ├── index.tsx               # Home tab screen
-│   │   ├── explore.tsx             # Explore tab screen
-│   │   ├── keypoints.tsx           # Keypoints visualization screen
-│   │   └── test.tsx                # Test screen
+│   │   ├── explore.tsx             # Explore tab screen (imports from src/screens/)
+│   │   ├── keypoints.tsx           # Keypoints visualization screen (imports from src/screens/)
+│   │   └── test.tsx                # Test screen (imports from src/screens/)
 │   └── Test Screens/
-│       ├── camera-test.tsx         # Camera integration tests
-│       ├── model-test.tsx          # ML model testing
-│       ├── pose-detection-test.tsx # Pose detection pipeline test
-│       └── preprocessing-test.tsx  # Image preprocessing tests
+│       ├── camera-test.tsx         # Camera integration tests (standalone, not routed)
+│       └── model-test.tsx          # ML model testing
 │
 ├── UI Components (components/)
 │   ├── Camera Components/
@@ -120,8 +118,7 @@ PoseApp/
 ├── ML Development (src/)
 │   ├── Components (components/)
 │   │   ├── ImagePreprocessorDemo.tsx # Preprocessing visualization
-│   │   ├── ModelTest.tsx           # Model testing interface
-│   │   └── PreprocessingTest.tsx   # Preprocessing test UI
+│   │   └── ModelTest.tsx           # Model testing interface
 │   │
 │   ├── Hooks (hooks/)
 │   │   ├── useImagePreprocessor.ts # Image preprocessing hook
@@ -130,11 +127,11 @@ PoseApp/
 │   │
 │   ├── Screens (screens/)
 │   │   ├── TestKeypointExtractionScreen.tsx # Keypoint testing screen
-│   │   └── TestPreprocessorScreen.tsx # Preprocessing testing screen
+│   │   ├── TestPreprocessorScreen.tsx # Preprocessing testing screen
+│   │   └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
 │   │
 │   └── Utils (utils/)
-│       ├── modelLoader.ts          # TensorFlow Lite model loading
-│       └── simplePreprocessor.ts   # Basic preprocessing utilities
+│       └── modelLoader.ts          # TensorFlow Lite model loading
 │
 ├── Configuration & Types
 │   ├── Types (types/)
