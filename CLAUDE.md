@@ -173,10 +173,8 @@ PoseApp/
 │           └── PrivacyInfo.xcprivacy # iOS privacy manifest
 │
 ├── Development Tools
-│   ├── scripts/
-│   │   └── reset-project.js        # Project reset utility
-│   ├── test-preprocessor.js        # Preprocessing test script
-│   └── simple-preprocessing-test.tsx # Simple preprocessing test
+│   └── scripts/
+│       └── reset-project.js        # Project reset utility
 │
 └── Generated/Build Artifacts
     ├── .expo/                      # Expo build cache and metadata
@@ -271,9 +269,4 @@ Both files contain identical implementations (~200+ lines duplicated):
 - Nearest-neighbor resizing logic  
 - Aspect ratio calculations
 - Data normalization functions
-
-**Navigation Cleanup History:**
-- Removed redundant keypoints tab and TestKeypointExtractionScreen (mock data testing)
-- Removed simple preprocessing test components (superseded by comprehensive TestPreprocessorScreen)
-- Streamlined to 2-tab navigation: Home + Explore + Test
 
