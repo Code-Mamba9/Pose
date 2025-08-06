@@ -93,8 +93,8 @@ PoseApp/
 │   │
 │   ├── Core ML Services (src/services/) # Advanced ML pipeline
 │   │   ├── PoseDetectionPipeline.ts # Complete pose detection pipeline
-│   │   ├── ImagePreprocessor.ts    # Image preprocessing base
-│   │   ├── ImagePreprocessorFunctions.ts # Preprocessing utilities
+│   │   ├── ImagePreprocessor.ts    # ⚠️ UNUSED - Class-based preprocessing with hardware acceleration
+│   │   ├── ImagePreprocessorFunctions.ts # ACTIVE - Functional preprocessing utilities 
 │   │   ├── ImagePreprocessorOptimized.ts # Optimized preprocessing
 │   │   ├── KeypointExtractor.ts    # Keypoint extraction from model output
 │   │   ├── MockMoveNetOutput.ts    # Mock MoveNet model output for testing
@@ -120,7 +120,6 @@ PoseApp/
 │   │   └── ModelTest.tsx           # Model testing interface
 │   │
 │   ├── Hooks (hooks/)
-│   │   ├── useImagePreprocessor.ts # Image preprocessing hook
 │   │   ├── useModelManager.ts      # Model management hook
 │   │   └── useSafeResizePlugin.ts  # Safe resize plugin hook
 │   │
@@ -246,4 +245,35 @@ PoseApp/
   - `vision-camera-resize-plugin` ^3.2.0 - Camera frame resizing
   - `zustand` ^5.0.6 - State management
   - `react-native-reanimated` ~3.17.4 - Animations and worklets
+
+## Code Analysis Findings
+
+### Dead Code Identified (2025-01-06)
+
+**Unused Image Preprocessing Implementation:**
+- `src/services/ImagePreprocessor.ts` - Complete class-based preprocessor with hardware acceleration support
+  - **Status**: UNUSED - No imports found in codebase
+  - **Features**: Dual-path processing (hardware + fallback), dependency injection, configuration management
+  - **Recommendation**: Safe to delete - sophisticated implementation but completely unused
+- `src/hooks/useImagePreprocessor.ts` - React hook wrapper for ImagePreprocessor class
+  - **Status**: DELETED - Was unused hook that wrapped unused class
+  - **Chain**: ImagePreprocessor.ts → useImagePreprocessor.ts (both unused)
+
+**Active Image Preprocessing Implementation:**
+- `src/services/ImagePreprocessorFunctions.ts` - Functional approach currently in use
+  - **Import Chain**: `ImagePreprocessorFunctions.ts` → `ImagePreprocessorDemo.tsx` → `TestPreprocessorScreen.tsx`
+  - **Pipeline Usage**: Also imported by `PoseDetectionPipeline.ts` for complete ML workflow
+  - **Status**: ACTIVE - Core component of current preprocessing architecture
+
+**Code Duplication Issues:**
+Both files contain identical implementations (~200+ lines duplicated):
+- YUV→RGB conversion algorithms
+- Nearest-neighbor resizing logic  
+- Aspect ratio calculations
+- Data normalization functions
+
+**Navigation Cleanup History:**
+- Removed redundant keypoints tab and TestKeypointExtractionScreen (mock data testing)
+- Removed simple preprocessing test components (superseded by comprehensive TestPreprocessorScreen)
+- Streamlined to 2-tab navigation: Home + Explore + Test
 

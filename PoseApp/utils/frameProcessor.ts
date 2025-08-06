@@ -1,7 +1,6 @@
 import { useFrameProcessor, runAtTargetFps, runAsync } from 'react-native-vision-camera';
 import { useSharedValue } from 'react-native-reanimated';
 import { useCallback, useRef, useState, useEffect } from 'react';
-import { Worklets } from 'react-native-worklets-core';
 import { useFrameMemoryManager, CPULoadMonitor, MemoryStats } from './memoryManager';
 import { useFrameProcessorErrorRecovery, FrameProcessingError, RecoveryStrategy } from './errorRecovery';
 import { processPoseDetection, DEFAULT_PIPELINE_CONFIG } from '../src/services/PoseDetectionPipeline';
@@ -79,7 +78,7 @@ export const useAdvancedFrameProcessor = (
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
-    
+
     const startTime = Date.now();
     frameCount.value += 1;
 
@@ -128,14 +127,14 @@ export const useAdvancedFrameProcessor = (
     // Run at target FPS to control processing load
     runAtTargetFps(targetFps, () => {
       'worklet'
-      
+
       if (enableAsyncProcessing) {
         // Process heavy computations asynchronously
         runAsync(frame, () => {
           'worklet'
           // This is where pose detection would run
           // const poseData = processPoseDetection(frame);
-          
+
           if (logFrameInfo) {
             console.log(`[FrameProcessor] Async processing for frame ${frameData.frameIndex}`);
           }
@@ -146,7 +145,7 @@ export const useAdvancedFrameProcessor = (
       if (enableMetrics) {
         const processingTime = Date.now() - startTime;
         lastProcessingTime.value = processingTime;
-        
+
         // Update processing times array for CPU monitoring
         const times = processingTimes.value;
         times.push(processingTime);
@@ -154,25 +153,25 @@ export const useAdvancedFrameProcessor = (
           times.shift();
         }
         processingTimes.value = times;
-        
+
         // Calculate rolling average
         avgProcessingTime.value = (avgProcessingTime.value * 0.9) + (processingTime * 0.1);
-        
+
         // Simple memory usage estimation (MB)
         const estimatedMemory = (frame.width * frame.height * 4) / (1024 * 1024);
         memoryUsage.value = (memoryUsage.value * 0.9) + (estimatedMemory * 0.1);
-        
+
         // Calculate FPS every second
         const now = Date.now();
         if (now - lastFpsCheck.value >= 1000) {
           currentFps.value = frameCount.value / ((now - lastFpsCheck.value) / 1000);
           lastFpsCheck.value = now;
           frameCount.value = 0;
-          
+
           // Simplified logging with worklet-compatible values
           const cpuInfo = `| CPU Load: ${cpuLoadHigh.value ? 'HIGH' : 'NORMAL'} | Skipped: ${framesSkipped.value}`;
           const memInfo = `| Memory: ${memoryUsage.value.toFixed(1)}MB`;
-          
+
           console.log(`🎥 [FrameProcessor METRICS] FPS: ${currentFps.value.toFixed(1)} | Avg Processing: ${avgProcessingTime.value.toFixed(2)}ms ${memInfo} ${cpuInfo}`);
         }
       }
@@ -222,7 +221,7 @@ export const useAdvancedFrameProcessor = (
 export const useBasicFrameProcessor = (logFrames: boolean = false) => {
   return useFrameProcessor((frame) => {
     'worklet'
-    
+
     if (logFrames) {
       console.log(`[BasicFrameProcessor] ${frame.width}x${frame.height} @ ${frame.timestamp}`);
     }
@@ -270,7 +269,7 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
-    
+
     const startTime = Date.now();
     frameCount.value += 1;
     totalFrames.value += 1;
@@ -278,7 +277,7 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
     // Run at configured target FPS
     runAtTargetFps(targetFps, () => {
       'worklet'
-      
+
       // Validate frame dimensions
       if (frame.width < 480 || frame.height < 480) {
         console.log(`[PoseDetection] Frame too small: ${frame.width}x${frame.height}`);
@@ -287,11 +286,11 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
 
       if (enableRealTimeInference) {
         // 🚀 REAL POSE DETECTION using complete pipeline with TensorFlow Lite Model
-        
+
         let simulatedKeypoints: any[];
         let confidence: number;
         let processingTime: number;
-        
+
         try {
           // Use the complete pipeline with real model inference
           const pipelineResult = processPoseDetection(frame, {
@@ -301,11 +300,11 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
             mockScenario: 'standing',
             model: model // Pass the real model for inference
           });
-          
+
           if (!pipelineResult.success) {
             throw new Error('Pipeline failed: ' + pipelineResult.error);
           }
-          
+
           // Extract keypoints from pipeline result and convert to expected format
           const pipelineKeypoints = pipelineResult.poseDetection.keypoints;
           simulatedKeypoints = Object.keys(pipelineKeypoints)
@@ -322,9 +321,9 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
 
           confidence = pipelineResult.poseDetection.overallConfidence;
           processingTime = pipelineResult.totalProcessingTime;
-          
+
           console.log(`🔍 [FrameProcessor] ${model ? 'Real' : 'Mock'} inference: ${simulatedKeypoints.length} keypoints, confidence: ${(confidence * 100).toFixed(1)}%`);
-          
+
         } catch (pipelineError) {
           console.error('❌ [FrameProcessor] Pipeline error:', pipelineError);
           // Fallback to basic mock data if pipeline fails
@@ -360,7 +359,7 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
 
         // Update latest data
         latestPoseData.value = poseData;
-        
+
         // Update success count
         if (confidence >= confidenceThreshold) {
           successCount.value += 1;
@@ -373,7 +372,7 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
             const avgX = recentKeypoints.reduce((sum, kp) => sum + kp.x, 0) / recentKeypoints.length;
             const avgY = recentKeypoints.reduce((sum, kp) => sum + kp.y, 0) / recentKeypoints.length;
             const avgConf = recentKeypoints.reduce((sum, kp) => sum + kp.confidence, 0) / recentKeypoints.length;
-            
+
             return {
               x: avgX,
               y: avgY,
@@ -420,7 +419,7 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
       const total = totalFrames.value;
       const success = successCount.value;
       const buffer = poseBuffer.value;
-      
+
       setReactiveData({
         latestPoseData: latestPoseData.value,
         bufferStats: {
