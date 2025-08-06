@@ -109,9 +109,7 @@ PoseApp/
 │   └── Utilities (utils/)
 │       ├── index.ts                # Utils barrel export
 │       ├── frameProcessor.ts       # Advanced frame processing with metrics
-│       ├── frameProcessorTest.ts   # Frame processor testing utilities
 │       ├── memoryManager.ts        # Memory optimization and monitoring
-│       ├── errorRecovery.ts        # Error handling and recovery
 │       └── PermissionManager.ts    # Device permissions management
 │
 ├── ML Development (src/)

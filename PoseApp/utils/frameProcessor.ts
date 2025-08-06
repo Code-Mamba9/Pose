@@ -2,7 +2,6 @@ import { useFrameProcessor, runAtTargetFps, runAsync } from 'react-native-vision
 import { useSharedValue } from 'react-native-reanimated';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useFrameMemoryManager, CPULoadMonitor, MemoryStats } from './memoryManager';
-import { useFrameProcessorErrorRecovery, FrameProcessingError, RecoveryStrategy } from './errorRecovery';
 import { processPoseDetection, DEFAULT_PIPELINE_CONFIG } from '../src/services/PoseDetectionPipeline';
 
 /**
