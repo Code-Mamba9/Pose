@@ -59,7 +59,6 @@ PoseApp/
 │   │   ├── _layout.tsx             # Tab layout configuration
 │   │   ├── index.tsx               # Home tab screen
 │   │   ├── explore.tsx             # Explore tab screen (imports from src/screens/)
-│   │   ├── keypoints.tsx           # Keypoints visualization screen (imports from src/screens/)
 │   │   └── test.tsx                # Test screen (imports from src/screens/)
 │   └── Test Screens/
 │       ├── camera-test.tsx         # Camera integration tests (standalone, not routed)
@@ -126,7 +125,6 @@ PoseApp/
 │   │   └── useSafeResizePlugin.ts  # Safe resize plugin hook
 │   │
 │   ├── Screens (screens/)
-│   │   ├── TestKeypointExtractionScreen.tsx # Keypoint testing screen
 │   │   ├── TestPreprocessorScreen.tsx # Preprocessing testing screen
 │   │   └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
 │   │
