@@ -3,8 +3,9 @@ import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Switch } from 're
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { usePoseDetectionFrameProcessor } from '@/utils/frameProcessor';
-import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission, useFrameProcessor } from 'react-native-vision-camera';
 import { useTensorflowModel } from 'react-native-fast-tflite';
+import { useResizePlugin } from 'vision-camera-resize-plugin';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -20,7 +21,6 @@ export default function PoseDetectionTestScreen() {
   const [smoothKeypoints, setSmoothKeypoints] = useState<any>(null);
 
   // Initialize TensorFlow Lite model using official hook
-  const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
 
   const cameraRef = useRef<Camera>(null);
 
@@ -28,13 +28,29 @@ export default function PoseDetectionTestScreen() {
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
 
+  const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
+  const poseEstimationModel = model.state === 'loaded' ? model.model : undefined;
+  const { resize } = useResizePlugin();
   // Initialize pose detection frame processor with current config and model
-  const {
-    frameProcessor,
-  } = usePoseDetectionFrameProcessor({
-    ...configSettings,
-    model: model.state === 'loaded' ? model.model : undefined // Pass loaded model directly
-  });
+  const frameProcessor = useFrameProcessor(
+    (frame) => {
+
+      'worklet'
+      if (model == null) return
+
+      const data = resize(frame, {
+        scale: {
+          width: 192,
+          height: 192,
+        },
+        pixelFormat: 'rgb',
+        dataType: 'uint8'
+      })
+      const output = poseEstimationModel?.runSync([data])
+
+      console.log(`detected ${output}`)
+    }
+    , [model])
 
 
   const handleCameraReady = useCallback(() => {
