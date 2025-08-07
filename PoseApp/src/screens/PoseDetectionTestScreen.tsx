@@ -9,9 +9,8 @@ import { useTensorflowModel } from 'react-native-fast-tflite';
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
   const [configSettings, setConfigSettings] = useState({
-    enableRealTimeInference: false,
+    enableRealTimeInference: true,
     enableAsyncProcessing: true,
-    enableAdaptiveSampling: true,
     targetFps: 25,
     confidenceThreshold: 0.3,
     maxBufferSize: 10
@@ -19,12 +18,11 @@ export default function PoseDetectionTestScreen() {
   const [latestPoseData, setLatestPoseData] = useState<any>(null);
   const [bufferStats, setBufferStats] = useState<any>(null);
   const [smoothKeypoints, setSmoothKeypoints] = useState<any>(null);
-  
+
   // Initialize TensorFlow Lite model using official hook
   const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
-  
+
   const cameraRef = useRef<Camera>(null);
-  const metricsInterval = useRef<NodeJS.Timeout | null>(null);
 
   // Proper camera device selection following react-native-vision-camera best practices
   const device = useCameraDevice('back');
@@ -33,34 +31,11 @@ export default function PoseDetectionTestScreen() {
   // Initialize pose detection frame processor with current config and model
   const {
     frameProcessor,
-    getLatestPoseData,
-    getBufferStats,
-    getSmoothKeypoints
   } = usePoseDetectionFrameProcessor({
     ...configSettings,
     model: model.state === 'loaded' ? model.model : undefined // Pass loaded model directly
   });
 
-  // Update metrics every second
-  useEffect(() => {
-    if (isReady) {
-      metricsInterval.current = setInterval(() => {
-        const latest = getLatestPoseData();
-        const stats = getBufferStats();
-        const smoothed = getSmoothKeypoints();
-        
-        setLatestPoseData(latest);
-        setBufferStats(stats);
-        setSmoothKeypoints(smoothed);
-      }, 1000);
-    }
-
-    return () => {
-      if (metricsInterval.current) {
-        clearInterval(metricsInterval.current);
-      }
-    };
-  }, [isReady, getLatestPoseData, getBufferStats, getSmoothKeypoints]);
 
   const handleCameraReady = useCallback(() => {
     console.log('Camera ready for pose detection');
@@ -83,7 +58,7 @@ export default function PoseDetectionTestScreen() {
   const renderConfigControls = () => (
     <View style={styles.configSection}>
       <ThemedText style={styles.sectionTitle}>Configuration</ThemedText>
-      
+
       {/* Model Status */}
       <View style={styles.controlRow}>
         <ThemedText style={styles.controlLabel}>TensorFlow Lite Model</ThemedText>
@@ -94,7 +69,7 @@ export default function PoseDetectionTestScreen() {
           {model.state === 'loading' ? 'Loading...' : model.state === 'loaded' ? 'Ready' : model.state === 'error' ? 'Failed' : 'Not Loaded'}
         </ThemedText>
       </View>
-      
+
       <View style={styles.controlRow}>
         <ThemedText style={styles.controlLabel}>Real-time Inference</ThemedText>
         <Switch
@@ -108,14 +83,6 @@ export default function PoseDetectionTestScreen() {
         <Switch
           value={configSettings.enableAsyncProcessing}
           onValueChange={(value) => updateConfig('enableAsyncProcessing', value)}
-        />
-      </View>
-
-      <View style={styles.controlRow}>
-        <ThemedText style={styles.controlLabel}>Adaptive Sampling</ThemedText>
-        <Switch
-          value={configSettings.enableAdaptiveSampling}
-          onValueChange={(value) => updateConfig('enableAdaptiveSampling', value)}
         />
       </View>
 
@@ -144,64 +111,11 @@ export default function PoseDetectionTestScreen() {
     </View>
   );
 
-  const renderPerformanceMetrics = () => (
-    <View style={styles.metricsSection}>
-      <ThemedText style={styles.sectionTitle}>Performance Metrics</ThemedText>
-      
-      {bufferStats && (
-        <>
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Current FPS:</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: bufferStats.currentFps >= 20 ? '#4CAF50' : '#FF9800' }
-            ]}>
-              {bufferStats.currentFps.toFixed(1)}
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Avg Processing Time:</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: bufferStats.avgProcessingTime < 40 ? '#4CAF50' : '#FF5722' }
-            ]}>
-              {bufferStats.avgProcessingTime.toFixed(1)}ms
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Total Frames:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {bufferStats.totalFrames}
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Success Rate:</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: bufferStats.successRate > 70 ? '#4CAF50' : '#FF9800' }
-            ]}>
-              {bufferStats.successRate.toFixed(1)}%
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Buffer Usage:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {bufferStats.bufferSize}/{bufferStats.maxBufferSize}
-            </ThemedText>
-          </View>
-        </>
-      )}
-    </View>
-  );
 
   const renderPoseData = () => (
     <View style={styles.poseSection}>
       <ThemedText style={styles.sectionTitle}>Latest Pose Data</ThemedText>
-      
+
       {latestPoseData ? (
         <>
           <View style={styles.metricRow}>
@@ -301,7 +215,7 @@ export default function PoseDetectionTestScreen() {
           onInitialized={handleCameraReady}
           onError={handleCameraError}
         />
-        
+
         {/* Status overlay */}
         <View style={styles.statusOverlay}>
           <View style={[
@@ -316,7 +230,6 @@ export default function PoseDetectionTestScreen() {
 
       <ScrollView style={styles.controlsContainer}>
         {renderConfigControls()}
-        {renderPerformanceMetrics()}
         {renderPoseData()}
 
         <View style={styles.instructions}>
