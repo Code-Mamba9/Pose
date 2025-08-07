@@ -4,8 +4,6 @@ import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera
 import { ImagePreprocessorDemo } from '../components/ImagePreprocessorDemo';
 
 export const TestPreprocessorScreen: React.FC = () => {
-  const [useFallback, setUseFallback] = useState(false);
-  const [useOptimized, setUseOptimized] = useState(true);
   const [enablePoseDetection, setEnablePoseDetection] = useState(false);
   const [mockScenario, setMockScenario] = useState<'standing' | 'sitting' | 'partial' | 'low_confidence'>('standing');
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -38,24 +36,6 @@ export const TestPreprocessorScreen: React.FC = () => {
       <View style={styles.controls}>
         <View style={styles.controlRow}>
           <Text style={styles.label}>
-            Mode: {useFallback ? 'Fallback (YUV→RGB)' : 'Plugin (Hardware)'}
-          </Text>
-          <Switch
-            value={useFallback}
-            onValueChange={setUseFallback}
-          />
-        </View>
-        <View style={styles.controlRow}>
-          <Text style={styles.label}>
-            Algorithm: {useOptimized ? 'Optimized' : 'Standard'}
-          </Text>
-          <Switch
-            value={useOptimized}
-            onValueChange={setUseOptimized}
-          />
-        </View>
-        <View style={styles.controlRow}>
-          <Text style={styles.label}>
             Pipeline: {enablePoseDetection ? 'Full (Preprocess + Pose)' : 'Preprocessing Only'}
           </Text>
           <Switch
@@ -63,6 +43,9 @@ export const TestPreprocessorScreen: React.FC = () => {
             onValueChange={setEnablePoseDetection}
           />
         </View>
+        <Text style={styles.infoText}>
+          Uses optimized preprocessing functions with software fallback
+        </Text>
         {enablePoseDetection && (
           <View style={styles.scenarioContainer}>
             <Text style={styles.scenarioLabel}>Mock Pose Scenario:</Text>
@@ -90,8 +73,6 @@ export const TestPreprocessorScreen: React.FC = () => {
       </View>
       
       <ImagePreprocessorDemo 
-        useFallback={useFallback}
-        useOptimized={useOptimized}
         device={device}
         enablePoseDetection={enablePoseDetection}
         mockScenario={mockScenario}
@@ -124,6 +105,12 @@ const styles = StyleSheet.create({
   label: {
     color: 'white',
     fontSize: 16,
+  },
+  infoText: {
+    color: '#aaa',
+    fontSize: 12,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   scenarioContainer: {
     marginTop: 12,

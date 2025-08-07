@@ -1,27 +1,22 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Camera, useFrameProcessor, type Frame, type CameraDevice } from 'react-native-vision-camera';
-import { preprocessFrame, MOVENET_PREPROCESSING_CONFIG } from '../services/ImagePreprocessorFunctions';
-import { preprocessFrameOptimized } from '../services/ImagePreprocessorOptimized';
+import { preprocessFrame, MOVENET_PREPROCESSING_CONFIG } from '../services/ImagePreprocessor';
 import { processPoseDetection, DEFAULT_PIPELINE_CONFIG, type PoseDetectionConfig } from '../services/PoseDetectionPipeline';
 
 interface ImagePreprocessorDemoProps {
-  useFallback?: boolean; // Option to test fallback processing
-  useOptimized?: boolean; // Option to test optimized version
   device: CameraDevice;
-  enablePoseDetection?: boolean; // New option to test full pipeline
+  enablePoseDetection?: boolean; // Option to test full pipeline
   mockScenario?: 'standing' | 'sitting' | 'partial' | 'low_confidence';
 }
 
 /**
- * Demo component showing fallback preprocessing approach
- * Uses native JavaScript implementation instead of resize plugin
+ * Demo component showing optimized preprocessing functions usage
+ * Uses software fallback with optimized algorithms (hardware acceleration available via processWithResizePlugin)
  */
 export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({ 
-  useFallback = true, // Default to fallback since plugin may not be available
-  useOptimized = true, // Default to optimized version for better performance
   device,
-  enablePoseDetection = false, // New option to test complete pipeline
+  enablePoseDetection = false, // Option to test complete pipeline
   mockScenario = 'standing' // Default mock scenario
 }) => {
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -34,7 +29,6 @@ export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({
         
         const pipelineConfig: PoseDetectionConfig = {
           ...DEFAULT_PIPELINE_CONFIG,
-          useOptimizedPreprocessing: useOptimized,
           enableMockMode: true, // Use mock inference for testing
           mockScenario: mockScenario,
           keypointConfig: {
@@ -94,11 +88,9 @@ export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({
           throw new Error('frame.toArrayBuffer() returned null/undefined');
         }
         
-        // Preprocess the frame for MoveNet using optimized or standard approach
-        console.log(`Calling ${useOptimized ? 'optimized' : 'standard'} preprocessFrame function...`);
-        const result = useOptimized 
-          ? preprocessFrameOptimized(frame, MOVENET_PREPROCESSING_CONFIG)
-          : preprocessFrame(frame, MOVENET_PREPROCESSING_CONFIG);
+        // Preprocess the frame for MoveNet using optimized preprocessing functions
+        console.log('Calling preprocessFrame...');
+        const result = preprocessFrame(frame, MOVENET_PREPROCESSING_CONFIG);
         
         console.log('Preprocessing completed:', {
           width: result.width,
@@ -112,12 +104,16 @@ export const ImagePreprocessorDemo: React.FC<ImagePreprocessorDemoProps> = ({
       
     } catch (error) {
       console.error('Frame processing error:');
-      console.error('Error message:', error?.message || 'No message');
-      console.error('Error name:', error?.name || 'No name');
-      console.error('Error stack:', error?.stack || 'No stack');
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error name:', error.name);
+        console.error('Error stack:', error.stack);
+      } else {
+        console.error('Unknown error:', error);
+      }
       console.error('Full error object:', error);
     }
-  }, [enablePoseDetection, useOptimized, mockScenario]);
+  }, [enablePoseDetection, mockScenario]);
 
   return (
     <Camera

@@ -201,7 +201,7 @@ PoseApp/
 - **Memory Management**: Advanced memory optimization for ML workloads
 
 #### ML Pipeline Architecture
-- **Preprocessing**: Optimized YUV→RGB conversion with resize plugins
+- **Preprocessing**: Worklet-compatible functional preprocessing with hardware acceleration support (`processWithResizePlugin`) and software fallback (`processWithFallback`)
 - **Model Inference**: TensorFlow Lite MoveNet integration (currently mocked for testing)  
 - **Keypoint Extraction**: 17-point human pose keypoint detection and processing
 - **Performance Monitoring**: Real-time FPS, memory usage, and processing time metrics
@@ -244,27 +244,32 @@ PoseApp/
 
 ## Code Analysis Findings
 
-### Dead Code Identified (2025-01-06)
+### Code Cleanup and Refactoring (2025-01-07)
 
-**Unused Image Preprocessing Implementation:**
-- `src/services/ImagePreprocessor.ts` - Complete class-based preprocessor with hardware acceleration support
-  - **Status**: UNUSED - No imports found in codebase
-  - **Features**: Dual-path processing (hardware + fallback), dependency injection, configuration management
-  - **Recommendation**: Safe to delete - sophisticated implementation but completely unused
-- `src/hooks/useImagePreprocessor.ts` - React hook wrapper for ImagePreprocessor class
-  - **Status**: DELETED - Was unused hook that wrapped unused class
-  - **Chain**: ImagePreprocessor.ts → useImagePreprocessor.ts (both unused)
+**Image Preprocessing Architecture Refactoring:**
+- **`src/services/ImagePreprocessor.ts`** - REFACTORED from class-based to functional worklet-compatible architecture
+  - **Status**: ACTIVE - Now contains worklet-compatible functions for frame processing
+  - **Features**: Hardware acceleration support (`processWithResizePlugin`), software fallback (`processWithFallback`), main entry point (`preprocessFrame`)
+  - **Architecture**: Functional approach with standalone worklet functions instead of class methods
+  - **Import Chain**: `ImagePreprocessor.ts` → `PoseDetectionPipeline.ts`, `ImagePreprocessorDemo.tsx`
 
-**Active Image Preprocessing Implementation:**
-- `src/services/ImagePreprocessorFunctions.ts` - Functional approach currently in use
-  - **Import Chain**: `ImagePreprocessorFunctions.ts` → `ImagePreprocessorDemo.tsx` → `TestPreprocessorScreen.tsx`
-  - **Pipeline Usage**: Also imported by `PoseDetectionPipeline.ts` for complete ML workflow
-  - **Status**: ACTIVE - Core component of current preprocessing architecture
+**Removed Dead Code Files:**
+- **`src/services/ImagePreprocessorFunctions.ts`** - DELETED (2025-01-07)
+  - **Reason**: Completely superseded by refactored ImagePreprocessor.ts
+  - **Code Duplication**: Had ~200+ lines identical to ImagePreprocessor.ts
+  - **Status**: Was unused - no imports found in codebase
 
-**Code Duplication Issues:**
-Both files contain identical implementations (~200+ lines duplicated):
-- YUV→RGB conversion algorithms
-- Nearest-neighbor resizing logic  
-- Aspect ratio calculations
-- Data normalization functions
+- **`src/services/ImagePreprocessorOptimized.ts`** - DELETED (2025-01-07)
+  - **Reason**: Unused optimized implementation with advanced performance techniques
+  - **Features**: Vectorized operations, fixed-point math, cache-friendly processing
+  - **Status**: Dead code - not imported anywhere, user decided to "forget about this implementation"
+
+- **`src/hooks/useImagePreprocessor.ts`** - DELETED (Previously)
+  - **Reason**: React hook wrapper for unused ImagePreprocessor class
+
+**Current Preprocessing Architecture:**
+- Single source of truth: `src/services/ImagePreprocessor.ts` with worklet-compatible functions
+- Supports both hardware acceleration and software fallback
+- No code duplication - consolidated all preprocessing logic
+- Worklet-compatible for real-time frame processing
 

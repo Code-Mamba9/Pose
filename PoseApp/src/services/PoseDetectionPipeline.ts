@@ -1,6 +1,9 @@
 import type { Frame } from 'react-native-vision-camera';
-import { preprocessFrame, MOVENET_PREPROCESSING_CONFIG, type PreprocessingResult } from './ImagePreprocessorFunctions';
-import { preprocessFrameOptimized } from './ImagePreprocessorOptimized';
+import { 
+  preprocessFrame,
+  MOVENET_PREPROCESSING_CONFIG, 
+  type PreprocessingResult 
+} from './ImagePreprocessor';
 import { 
   extractPoseKeypoints, 
   DEFAULT_KEYPOINT_CONFIG,
@@ -13,7 +16,6 @@ import { generateMockMoveNetOutput } from './MockMoveNetOutput';
  * Configuration for the complete pose detection pipeline
  */
 export interface PoseDetectionConfig {
-  useOptimizedPreprocessing: boolean;
   preprocessingConfig: typeof MOVENET_PREPROCESSING_CONFIG;
   keypointConfig: KeypointExtractionConfig;
   enableMockMode: boolean; // For testing without actual model inference
@@ -36,7 +38,6 @@ export interface PipelineResult {
  * Default pipeline configuration optimized for real-time performance
  */
 export const DEFAULT_PIPELINE_CONFIG: PoseDetectionConfig = {
-  useOptimizedPreprocessing: true,
   preprocessingConfig: MOVENET_PREPROCESSING_CONFIG,
   keypointConfig: {
     ...DEFAULT_KEYPOINT_CONFIG,
@@ -61,10 +62,9 @@ export function processPoseDetection(
   const totalStartTime = Date.now();
   
   try {
-    // Step 1: Preprocess the camera frame
-    const preprocessingResult = config.useOptimizedPreprocessing
-      ? preprocessFrameOptimized(frame, config.preprocessingConfig)
-      : preprocessFrame(frame, config.preprocessingConfig);
+    // Step 1: Preprocess the camera frame using optimized preprocessing functions
+    // Uses software fallback with optimized algorithms (hardware acceleration available via processWithResizePlugin)
+    const preprocessingResult = preprocessFrame(frame, config.preprocessingConfig);
     
     // Step 2: Run model inference (real TensorFlow Lite or mock)
     let modelOutput: Float32Array;
@@ -163,37 +163,33 @@ export function runPipelineBenchmark(
     config: PoseDetectionConfig;
   }> = [
     {
-      name: 'Optimized + Standing',
+      name: 'Standing',
       config: {
         ...DEFAULT_PIPELINE_CONFIG,
-        useOptimizedPreprocessing: true,
         enableMockMode: true,
         mockScenario: 'standing',
       }
     },
     {
-      name: 'Standard + Standing',
+      name: 'Sitting',
       config: {
         ...DEFAULT_PIPELINE_CONFIG,
-        useOptimizedPreprocessing: false,
         enableMockMode: true,
-        mockScenario: 'standing',
+        mockScenario: 'sitting',
       }
     },
     {
-      name: 'Optimized + Partial',
+      name: 'Partial',
       config: {
         ...DEFAULT_PIPELINE_CONFIG,
-        useOptimizedPreprocessing: true,
         enableMockMode: true,
         mockScenario: 'partial',
       }
     },
     {
-      name: 'Optimized + Low Confidence',
+      name: 'Low Confidence',
       config: {
         ...DEFAULT_PIPELINE_CONFIG,
-        useOptimizedPreprocessing: true,
         enableMockMode: true,
         mockScenario: 'low_confidence',
       }

@@ -294,7 +294,6 @@ export const usePoseDetectionFrameProcessor = (config: any = {}) => {
           // Use the complete pipeline with real model inference
           const pipelineResult = processPoseDetection(frame, {
             ...DEFAULT_PIPELINE_CONFIG,
-            useOptimizedPreprocessing: true,
             enableMockMode: !model, // Use mock only if no model available
             mockScenario: 'standing',
             model: model // Pass the real model for inference
