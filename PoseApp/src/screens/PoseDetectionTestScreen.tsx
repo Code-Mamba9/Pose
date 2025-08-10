@@ -2,26 +2,12 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { usePoseDetectionFrameProcessor } from '@/utils/frameProcessor';
 import { Camera, useCameraDevice, useCameraPermission, useFrameProcessor } from 'react-native-vision-camera';
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
-  const [configSettings, setConfigSettings] = useState({
-    enableRealTimeInference: true,
-    enableAsyncProcessing: true,
-    targetFps: 25,
-    confidenceThreshold: 0.3,
-    maxBufferSize: 10
-  });
-  const [latestPoseData, setLatestPoseData] = useState<any>(null);
-  const [bufferStats, setBufferStats] = useState<any>(null);
-  const [smoothKeypoints, setSmoothKeypoints] = useState<any>(null);
-
-  // Initialize TensorFlow Lite model using official hook
-
   const cameraRef = useRef<Camera>(null);
 
   // Proper camera device selection following react-native-vision-camera best practices
@@ -36,7 +22,7 @@ export default function PoseDetectionTestScreen() {
     (frame) => {
 
       'worklet'
-      if (model == null) return
+      if (poseEstimationModel == null) return
 
       const data = resize(frame, {
         scale: {
@@ -64,130 +50,6 @@ export default function PoseDetectionTestScreen() {
     setIsReady(false);
   }, []);
 
-  const updateConfig = useCallback((key: string, value: any) => {
-    setConfigSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  }, []);
-
-  const renderConfigControls = () => (
-    <View style={styles.configSection}>
-      <ThemedText style={styles.sectionTitle}>Configuration</ThemedText>
-
-      {/* Model Status */}
-      <View style={styles.controlRow}>
-        <ThemedText style={styles.controlLabel}>TensorFlow Lite Model</ThemedText>
-        <ThemedText style={[
-          styles.metricValue,
-          { color: model.state === 'loaded' ? '#4CAF50' : model.state === 'loading' ? '#FF9800' : model.state === 'error' ? '#FF5722' : '#666' }
-        ]}>
-          {model.state === 'loading' ? 'Loading...' : model.state === 'loaded' ? 'Ready' : model.state === 'error' ? 'Failed' : 'Not Loaded'}
-        </ThemedText>
-      </View>
-
-      <View style={styles.controlRow}>
-        <ThemedText style={styles.controlLabel}>Real-time Inference</ThemedText>
-        <Switch
-          value={configSettings.enableRealTimeInference}
-          onValueChange={(value) => updateConfig('enableRealTimeInference', value)}
-        />
-      </View>
-
-      <View style={styles.controlRow}>
-        <ThemedText style={styles.controlLabel}>Async Processing</ThemedText>
-        <Switch
-          value={configSettings.enableAsyncProcessing}
-          onValueChange={(value) => updateConfig('enableAsyncProcessing', value)}
-        />
-      </View>
-
-      <View style={styles.controlRow}>
-        <ThemedText style={styles.controlLabel}>Target FPS</ThemedText>
-        <View style={styles.fpsControls}>
-          {[15, 20, 25, 30].map(fps => (
-            <TouchableOpacity
-              key={fps}
-              style={[
-                styles.fpsButton,
-                configSettings.targetFps === fps && styles.fpsButtonActive
-              ]}
-              onPress={() => updateConfig('targetFps', fps)}
-            >
-              <Text style={[
-                styles.fpsButtonText,
-                configSettings.targetFps === fps && styles.fpsButtonTextActive
-              ]}>
-                {fps}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-
-
-  const renderPoseData = () => (
-    <View style={styles.poseSection}>
-      <ThemedText style={styles.sectionTitle}>Latest Pose Data</ThemedText>
-
-      {latestPoseData ? (
-        <>
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Frame Size:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {latestPoseData.frameWidth}x{latestPoseData.frameHeight}
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Confidence:</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: latestPoseData.confidence > 0.7 ? '#4CAF50' : latestPoseData.confidence > 0.4 ? '#FF9800' : '#FF5722' }
-            ]}>
-              {(latestPoseData.confidence * 100).toFixed(1)}%
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Keypoints:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {latestPoseData.keypoints.length}/17
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Processing Time:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {latestPoseData.processingTime.toFixed(1)}ms
-            </ThemedText>
-          </View>
-
-          <View style={styles.metricRow}>
-            <ThemedText style={styles.metricLabel}>Timestamp:</ThemedText>
-            <ThemedText style={styles.metricValue}>
-              {new Date(latestPoseData.timestamp).toLocaleTimeString()}
-            </ThemedText>
-          </View>
-        </>
-      ) : (
-        <ThemedText style={styles.noDataText}>
-          No pose data available yet. Enable real-time inference to see results.
-        </ThemedText>
-      )}
-
-      {smoothKeypoints && (
-        <View style={styles.smoothingSection}>
-          <ThemedText style={styles.subSectionTitle}>Temporal Smoothing</ThemedText>
-          <ThemedText style={styles.metricLabel}>
-            Valid smoothed keypoints: {smoothKeypoints.filter((kp: any) => kp !== null).length}/17
-          </ThemedText>
-        </View>
-      )}
-    </View>
-  );
 
   // Handle permission and device states properly
   if (!hasPermission) {
@@ -244,24 +106,6 @@ export default function PoseDetectionTestScreen() {
         </View>
       </View>
 
-      <ScrollView style={styles.controlsContainer}>
-        {renderConfigControls()}
-        {renderPoseData()}
-
-        <View style={styles.instructions}>
-          <ThemedText style={styles.instructionTitle}>Instructions:</ThemedText>
-          <ThemedText style={styles.instructionText}>
-            • Enable "Real-time Inference" to see actual pose detection{'\n'}
-            • "Async Processing" runs heavy tasks on separate thread{'\n'}
-            • "Adaptive Sampling" adjusts FPS based on device performance{'\n'}
-            • Green metrics = good performance, Orange/Red = issues{'\n'}
-            • Buffer stores recent frames for temporal smoothing{'\n'}
-            • Check console for detailed frame processing logs{'\n'}
-            • Current implementation uses simulated pose data{'\n'}
-            • Ready for TensorFlow Lite model integration
-          </ThemedText>
-        </View>
-      </ScrollView>
     </ThemedView>
   );
 }

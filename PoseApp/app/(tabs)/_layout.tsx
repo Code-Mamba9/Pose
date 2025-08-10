@@ -54,15 +54,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="keypoints"
-        options={{
-          title: "Keypoints",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="figure.walk" color={color} />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
