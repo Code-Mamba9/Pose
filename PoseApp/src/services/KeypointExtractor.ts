@@ -28,7 +28,7 @@ export interface PoseKeypoints {
   rightEye: Keypoint;
   leftEar: Keypoint;
   rightEar: Keypoint;
-  
+
   // Upper body keypoints
   leftShoulder: Keypoint;
   rightShoulder: Keypoint;
@@ -36,7 +36,7 @@ export interface PoseKeypoints {
   rightElbow: Keypoint;
   leftWrist: Keypoint;
   rightWrist: Keypoint;
-  
+
   // Lower body keypoints
   leftHip: Keypoint;
   rightHip: Keypoint;
@@ -56,7 +56,7 @@ export interface ScreenPoseKeypoints {
   rightEye: ScreenKeypoint;
   leftEar: ScreenKeypoint;
   rightEar: ScreenKeypoint;
-  
+
   // Upper body keypoints
   leftShoulder: ScreenKeypoint;
   rightShoulder: ScreenKeypoint;
@@ -64,7 +64,7 @@ export interface ScreenPoseKeypoints {
   rightElbow: ScreenKeypoint;
   leftWrist: ScreenKeypoint;
   rightWrist: ScreenKeypoint;
-  
+
   // Lower body keypoints
   leftHip: ScreenKeypoint;
   rightHip: ScreenKeypoint;
@@ -100,9 +100,9 @@ export interface KeypointExtractionConfig {
  * Default configuration for MoveNet keypoint extraction
  */
 export const DEFAULT_KEYPOINT_CONFIG: KeypointExtractionConfig = {
-  confidenceThreshold: 0.3, // 30% confidence threshold
-  screenWidth: 192,  // Will be overridden with actual screen dimensions
-  screenHeight: 192, // Will be overridden with actual screen dimensions
+  confidenceThreshold: 0.2, // 30% confidence threshold
+  screenWidth: 1080,  // Will be overridden with actual screen dimensions
+  screenHeight: 1920, // Will be overridden with actual screen dimensions
 };
 
 /**
@@ -139,7 +139,7 @@ export const POSE_CONNECTIONS = [
   [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightEye],
   [KEYPOINT_INDICES.leftEye, KEYPOINT_INDICES.leftEar],
   [KEYPOINT_INDICES.rightEye, KEYPOINT_INDICES.rightEar],
-  
+
   // Upper body connections
   [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.leftShoulder],
   [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightShoulder],
@@ -148,12 +148,12 @@ export const POSE_CONNECTIONS = [
   [KEYPOINT_INDICES.rightShoulder, KEYPOINT_INDICES.rightElbow],
   [KEYPOINT_INDICES.rightElbow, KEYPOINT_INDICES.rightWrist],
   [KEYPOINT_INDICES.leftShoulder, KEYPOINT_INDICES.rightShoulder],
-  
+
   // Torso connections
   [KEYPOINT_INDICES.leftShoulder, KEYPOINT_INDICES.leftHip],
   [KEYPOINT_INDICES.rightShoulder, KEYPOINT_INDICES.rightHip],
   [KEYPOINT_INDICES.leftHip, KEYPOINT_INDICES.rightHip],
-  
+
   // Lower body connections
   [KEYPOINT_INDICES.leftHip, KEYPOINT_INDICES.leftKnee],
   [KEYPOINT_INDICES.leftKnee, KEYPOINT_INDICES.leftAnkle],
@@ -169,21 +169,21 @@ function extractKeypoint(
   keypointIndex: number
 ): Keypoint {
   'worklet';
-  
+
   // MoveNet output format: [batch, person, keypoint, [y, x, confidence]]
   // For single person detection: tensor shape is flattened to [1 * 1 * 17 * 3] = [51]
   const baseIndex = keypointIndex * 3;
-  
+
   // Bounds checking
   if (baseIndex + 2 >= outputTensor.length) {
     console.warn(`Keypoint index ${keypointIndex} out of bounds for tensor length ${outputTensor.length}`);
     return { x: 0, y: 0, confidence: 0 };
   }
-  
+
   const y = outputTensor[baseIndex];     // Y coordinate (normalized)
   const x = outputTensor[baseIndex + 1]; // X coordinate (normalized)  
   const confidence = outputTensor[baseIndex + 2]; // Confidence score
-  
+
   // Clamp values to valid ranges
   return {
     x: Math.max(0, Math.min(1, x || 0)),
@@ -201,7 +201,7 @@ function keypointToScreen(
   screenHeight: number
 ): ScreenKeypoint {
   'worklet';
-  
+
   return {
     x: keypoint.x * screenWidth,
     y: keypoint.y * screenHeight,
@@ -214,16 +214,16 @@ function keypointToScreen(
  */
 function calculateOverallConfidence(keypoints: PoseKeypoints): number {
   'worklet';
-  
+
   // Key keypoints for overall pose assessment
   const keyKeypointNames: (keyof PoseKeypoints)[] = [
-    'nose', 'leftShoulder', 'rightShoulder', 
+    'nose', 'leftShoulder', 'rightShoulder',
     'leftHip', 'rightHip', 'leftKnee', 'rightKnee'
   ];
-  
+
   let totalConfidence = 0;
   let validKeypoints = 0;
-  
+
   for (const name of keyKeypointNames) {
     const keypoint = keypoints[name];
     if (keypoint.confidence > 0.1) { // Very low threshold for counting
@@ -231,7 +231,7 @@ function calculateOverallConfidence(keypoints: PoseKeypoints): number {
       validKeypoints++;
     }
   }
-  
+
   return validKeypoints > 0 ? totalConfidence / validKeypoints : 0;
 }
 
@@ -243,16 +243,16 @@ function countValidKeypoints(
   threshold: number
 ): number {
   'worklet';
-  
+
   let count = 0;
   const keypointValues = Object.values(keypoints);
-  
+
   for (const keypoint of keypointValues) {
     if (keypoint.confidence >= threshold) {
       count++;
     }
   }
-  
+
   return count;
 }
 
@@ -260,20 +260,20 @@ function countValidKeypoints(
  * Main function to extract pose keypoints from MoveNet model output
  */
 export function extractPoseKeypoints(
-  modelOutput: Float32Array,
+  modelOutput: any,
   config: KeypointExtractionConfig = DEFAULT_KEYPOINT_CONFIG
 ): PoseDetectionResult {
   'worklet';
-  
+
   const startTime = Date.now();
-  
+
   try {
-    
+
     // Validate tensor shape
     if (modelOutput.length !== 51) {
       throw new Error(`Invalid MoveNet output shape. Expected 51 values (1*1*17*3), got ${modelOutput.length}`);
     }
-    
+
     // Extract all 17 keypoints
     const keypoints: PoseKeypoints = {
       nose: extractKeypoint(modelOutput, KEYPOINT_INDICES.nose),
@@ -294,7 +294,7 @@ export function extractPoseKeypoints(
       leftAnkle: extractKeypoint(modelOutput, KEYPOINT_INDICES.leftAnkle),
       rightAnkle: extractKeypoint(modelOutput, KEYPOINT_INDICES.rightAnkle),
     };
-    
+
     // Convert to screen coordinates
     const screenKeypoints: ScreenPoseKeypoints = {
       nose: keypointToScreen(keypoints.nose, config.screenWidth, config.screenHeight),
@@ -315,14 +315,14 @@ export function extractPoseKeypoints(
       leftAnkle: keypointToScreen(keypoints.leftAnkle, config.screenWidth, config.screenHeight),
       rightAnkle: keypointToScreen(keypoints.rightAnkle, config.screenWidth, config.screenHeight),
     };
-    
+
     // Calculate confidence metrics
     const overallConfidence = calculateOverallConfidence(keypoints);
     const validKeypoints = countValidKeypoints(keypoints, config.confidenceThreshold);
-    
+
     const processingTime = Date.now() - startTime;
-    
-    
+
+
     // Log all keypoints for debugging
     console.log('All keypoints:', {
       nose: `(${keypoints.nose.x.toFixed(3)}, ${keypoints.nose.y.toFixed(3)}) conf: ${keypoints.nose.confidence.toFixed(3)}`,
@@ -343,7 +343,7 @@ export function extractPoseKeypoints(
       leftAnkle: `(${keypoints.leftAnkle.x.toFixed(3)}, ${keypoints.leftAnkle.y.toFixed(3)}) conf: ${keypoints.leftAnkle.confidence.toFixed(3)}`,
       rightAnkle: `(${keypoints.rightAnkle.x.toFixed(3)}, ${keypoints.rightAnkle.y.toFixed(3)}) conf: ${keypoints.rightAnkle.confidence.toFixed(3)}`
     });
-    
+
     return {
       keypoints,
       screenKeypoints,
@@ -353,7 +353,7 @@ export function extractPoseKeypoints(
       frameWidth: config.screenWidth,
       frameHeight: config.screenHeight,
     };
-    
+
   } catch (error) {
     console.error('Keypoint extraction failed - detailed error:', {
       error: error,
@@ -375,15 +375,15 @@ export function filterKeypointsByConfidence(
   threshold: number
 ): Partial<PoseKeypoints> {
   'worklet';
-  
+
   const filtered: Partial<PoseKeypoints> = {};
-  
+
   for (const [name, keypoint] of Object.entries(keypoints)) {
     if (keypoint.confidence >= threshold) {
       (filtered as any)[name] = keypoint;
     }
   }
-  
+
   return filtered;
 }
 
@@ -393,17 +393,17 @@ export function filterKeypointsByConfidence(
 export function getHighConfidenceKeypoints(
   result: PoseDetectionResult,
   threshold: number = 0.5
-): Array<{name: string, keypoint: ScreenKeypoint}> {
+): Array<{ name: string, keypoint: ScreenKeypoint }> {
   'worklet';
-  
-  const highConfidenceKeypoints: Array<{name: string, keypoint: ScreenKeypoint}> = [];
-  
+
+  const highConfidenceKeypoints: Array<{ name: string, keypoint: ScreenKeypoint }> = [];
+
   for (const [name, keypoint] of Object.entries(result.screenKeypoints)) {
     if (keypoint.confidence >= threshold) {
       highConfidenceKeypoints.push({ name, keypoint });
     }
   }
-  
+
   return highConfidenceKeypoints;
 }
 
@@ -413,21 +413,21 @@ export function getHighConfidenceKeypoints(
 export function getValidConnections(
   result: PoseDetectionResult,
   threshold: number = 0.5
-): Array<{start: ScreenKeypoint, end: ScreenKeypoint}> {
+): Array<{ start: ScreenKeypoint, end: ScreenKeypoint }> {
   'worklet';
-  
-  const validConnections: Array<{start: ScreenKeypoint, end: ScreenKeypoint}> = [];
+
+  const validConnections: Array<{ start: ScreenKeypoint, end: ScreenKeypoint }> = [];
   const keypointNames = Object.keys(KEYPOINT_INDICES) as (keyof typeof KEYPOINT_INDICES)[];
-  
+
   for (const [startIdx, endIdx] of POSE_CONNECTIONS) {
     // Find keypoint names by index
     const startName = keypointNames.find(name => KEYPOINT_INDICES[name] === startIdx);
     const endName = keypointNames.find(name => KEYPOINT_INDICES[name] === endIdx);
-    
+
     if (startName && endName) {
       const startKeypoint = result.screenKeypoints[startName];
       const endKeypoint = result.screenKeypoints[endName];
-      
+
       // Only include connection if both keypoints have sufficient confidence
       if (startKeypoint.confidence >= threshold && endKeypoint.confidence >= threshold) {
         validConnections.push({
@@ -437,6 +437,6 @@ export function getValidConnections(
       }
     }
   }
-  
+
   return validConnections;
 }

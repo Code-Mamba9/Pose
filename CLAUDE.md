@@ -56,17 +56,14 @@ PoseApp/
 │   ├── _layout.tsx                 # Root layout with theme provider and navigation
 │   ├── +not-found.tsx              # 404 error page
 │   ├── (tabs)/                     # Tab-based routing
-│   │   ├── _layout.tsx             # Tab layout configuration
+│   │   ├── _layout.tsx             # Tab layout configuration (3 tabs: home, explore, test)
 │   │   ├── index.tsx               # Home tab screen
 │   │   ├── explore.tsx             # Explore tab screen (imports from src/screens/)
 │   │   └── test.tsx                # Test screen (imports from src/screens/)
-│   └── Test Screens/
-│       ├── camera-test.tsx         # Camera integration tests (standalone, not routed)
-│       └── model-test.tsx          # ML model testing
+│   └── model-test.tsx              # ML model testing (standalone, not routed)
 │
 ├── UI Components (components/)
 │   ├── Camera Components/
-│   │   ├── CameraView.tsx          # Main camera component
 │   │   ├── CameraPermissionHandler.tsx # Permission management
 │   │   └── PermissionDeniedView.tsx # Permission denied UI
 │   ├── UI Framework/
@@ -93,9 +90,7 @@ PoseApp/
 │   │
 │   ├── Core ML Services (src/services/) # Advanced ML pipeline
 │   │   ├── PoseDetectionPipeline.ts # Complete pose detection pipeline
-│   │   ├── ImagePreprocessor.ts    # ⚠️ UNUSED - Class-based preprocessing with hardware acceleration
-│   │   ├── ImagePreprocessorFunctions.ts # ACTIVE - Functional preprocessing utilities 
-│   │   ├── ImagePreprocessorOptimized.ts # Optimized preprocessing
+│   │   ├── ImagePreprocessor.ts    # ACTIVE - Worklet-compatible functional preprocessing with hardware acceleration
 │   │   ├── KeypointExtractor.ts    # Keypoint extraction from model output
 │   │   ├── MockMoveNetOutput.ts    # Mock MoveNet model output for testing
 │   │   └── ModelManager.ts         # TensorFlow Lite model management
@@ -107,9 +102,7 @@ PoseApp/
 │   │   └── userStore.ts            # User data and preferences
 │   │
 │   └── Utilities (utils/)
-│       ├── index.ts                # Utils barrel export
-│       ├── frameProcessor.ts       # Advanced frame processing with metrics
-│       ├── memoryManager.ts        # Memory optimization and monitoring
+│       ├── index.ts                # Utils barrel export with common utility functions
 │       └── PermissionManager.ts    # Device permissions management
 │
 ├── ML Development (src/)
@@ -202,10 +195,9 @@ PoseApp/
 
 #### ML Pipeline Architecture
 - **Preprocessing**: Worklet-compatible functional preprocessing with hardware acceleration support (`processWithResizePlugin`) and software fallback (`processWithFallback`)
-- **Model Inference**: TensorFlow Lite MoveNet integration (currently mocked for testing)  
+- **Model Inference**: TensorFlow Lite MoveNet integration using `react-native-fast-tflite` 
 - **Keypoint Extraction**: 17-point human pose keypoint detection and processing
-- **Performance Monitoring**: Real-time FPS, memory usage, and processing time metrics
-- **Frame Processing**: Advanced frame processor with adaptive sampling and CPU load management
+- **Frame Processing**: Real-time frame processing using `react-native-vision-camera` with worklets
 
 ### TypeScript Configuration
 - Strict mode enabled with comprehensive type checking
@@ -244,6 +236,20 @@ PoseApp/
 
 ## Code Analysis Findings
 
+### Recent Code Cleanup and Updates (2025-01-10)
+
+**Navigation Architecture Updates:**
+- **Removed extraneous route**: `keypoints` tab removed from `app/(tabs)/_layout.tsx` (2025-01-10)
+  - **Issue**: Tab configuration existed without corresponding `keypoints.tsx` file
+  - **Fix**: Removed keypoints tab screen definition, now has 3 tabs: home, explore, test
+  - **Status**: Navigation error "route keypoint is extraneous" resolved
+
+**Screen Component Simplification:**
+- **`src/screens/PoseDetectionTestScreen.tsx`** - SIMPLIFIED (2025-01-10)
+  - **Removed**: Complex UI controls, metrics display, configuration panels
+  - **Current**: Minimal camera view with status overlay only
+  - **Cleanup**: Removed ~108 lines of unused styling code for deleted UI components
+
 ### Code Cleanup and Refactoring (2025-01-07)
 
 **Image Preprocessing Architecture Refactoring:**
@@ -267,9 +273,9 @@ PoseApp/
 - **`src/hooks/useImagePreprocessor.ts`** - DELETED (Previously)
   - **Reason**: React hook wrapper for unused ImagePreprocessor class
 
-**Current Preprocessing Architecture:**
-- Single source of truth: `src/services/ImagePreprocessor.ts` with worklet-compatible functions
-- Supports both hardware acceleration and software fallback
-- No code duplication - consolidated all preprocessing logic
-- Worklet-compatible for real-time frame processing
+**Current Architecture Status:**
+- **Navigation**: 3-tab layout (home, explore, test) with clean routing
+- **Preprocessing**: Single source of truth: `src/services/ImagePreprocessor.ts` with worklet-compatible functions
+- **Camera Integration**: Simplified test screen using `react-native-vision-camera` with `react-native-fast-tflite`
+- **Code Quality**: No code duplication, consolidated preprocessing logic, worklet-compatible for real-time frame processing
 

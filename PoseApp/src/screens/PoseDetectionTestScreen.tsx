@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { Camera, useCameraDevice, useCameraPermission, useFrameProcessor } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission, useSkiaFrameProcessor, useFrameProcessor, DrawableFrame } from 'react-native-vision-camera';
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
+import { Skia, PaintStyle } from '@shopify/react-native-skia';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -14,29 +15,75 @@ export default function PoseDetectionTestScreen() {
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
 
-  const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
+  // const model = useTensorflowModel(require('../../assets/models/movenet_lightning_f16.tflite'));
+  const model = useTensorflowModel(require('../../assets/models/movenet_thunder.tflite'));
   const poseEstimationModel = model.state === 'loaded' ? model.model : undefined;
   const { resize } = useResizePlugin();
-  // Initialize pose detection frame processor with current config and model
-  const frameProcessor = useFrameProcessor(
-    (frame) => {
+  const paint = Skia.Paint();
+  paint.setStyle(PaintStyle.Fill);
+  paint.setStrokeWidth(2);
+  paint.setColor(Skia.Color('red'));
 
+  const linePaint = Skia.Paint();
+  linePaint.setStyle(PaintStyle.Fill);
+  linePaint.setStrokeWidth(4);
+  linePaint.setColor(Skia.Color('lime'));
+
+  const radius = 10
+  // Initialize pose detection frame processor with current config and model
+  const frameProcessor = useSkiaFrameProcessor(
+    (frame: DrawableFrame) => {
       'worklet'
       if (poseEstimationModel == null) return
-
-      const data = resize(frame, {
+      frame.render()
+      const smaller = resize(frame, {
         scale: {
-          width: 192,
-          height: 192,
+          width: 256,
+          height: 256,
         },
         pixelFormat: 'rgb',
         dataType: 'uint8'
       })
-      const output = poseEstimationModel?.runSync([data])
+      const outputs = poseEstimationModel?.runSync([smaller]);
+      const output = outputs[0];
+      const frameWidth = frame.width;
+      const frameHeight = frame.height;
 
-      console.log(`detected ${output}`)
+
+      try {
+        console.log(output)
+        for (let i = 0; i < 17; i++) {
+          const X = Number(output[3 * i + 1]) * frameWidth
+          const Y = Number(output[3 * i]) * frameHeight
+          if (output[3 * i + 2] > 0.15) {
+            frame.drawCircle(X, Y, radius, paint)
+            // frame.drawText(String(i), X, Y, paint, Skia.Font(undefined, 10))
+          }
+
+        }
+        // Extract pose keypoints with frame dimensions for proper scaling
+        // const poseResult = extractPoseKeypoints(output);
+
+        // const highConfidenceKeypoints = getHighConfidenceKeypoints(poseResult, 0.25);
+
+        // Create paint for drawing keypoints
+        // const keypointPaint = Skia.Paint();
+        // keypointPaint.setColor(Skia.Color('#00FF00')); // Green color
+        // keypointPaint.setStyle(0); // Fill style
+        //
+        // // Draw each high-confidence keypoint as a circle
+        // for (const { keypoint } of highConfidenceKeypoints) {
+        //   const radius = 8; // Circle radius in pixels
+        //   frame.drawCircle(keypoint.x, keypoint.y, radius, keypointPaint);
+        // }
+        //
+        // console.log(`Detected ${highConfidenceKeypoints.length} high-confidence keypoints`);
+
+      } catch (error) {
+        console.error('Error processing keypoints:', error);
+      }
     }
-    , [model])
+    , [model, paint])
 
 
   const handleCameraReady = useCallback(() => {
