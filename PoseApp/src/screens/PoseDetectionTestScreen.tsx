@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { Camera, useCameraDevice, useCameraPermission, useSkiaFrameProcessor, useFrameProcessor, DrawableFrame } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission, useSkiaFrameProcessor, DrawableFrame } from 'react-native-vision-camera';
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
 import { Skia, PaintStyle } from '@shopify/react-native-skia';
+import { POSE_CONNECTIONS } from '../services/KeypointExtractor';
+import { MIN_CONFIDENCE } from '@/constants';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -21,13 +23,8 @@ export default function PoseDetectionTestScreen() {
   const { resize } = useResizePlugin();
   const paint = Skia.Paint();
   paint.setStyle(PaintStyle.Fill);
-  paint.setStrokeWidth(2);
+  paint.setStrokeWidth(3);
   paint.setColor(Skia.Color('red'));
-
-  const linePaint = Skia.Paint();
-  linePaint.setStyle(PaintStyle.Fill);
-  linePaint.setStrokeWidth(4);
-  linePaint.setColor(Skia.Color('lime'));
 
   const radius = 10
   // Initialize pose detection frame processor with current config and model
@@ -55,29 +52,20 @@ export default function PoseDetectionTestScreen() {
         for (let i = 0; i < 17; i++) {
           const X = Number(output[3 * i + 1]) * frameWidth
           const Y = Number(output[3 * i]) * frameHeight
-          if (output[3 * i + 2] > 0.15) {
+          if (output[3 * i + 2] > MIN_CONFIDENCE) {
             frame.drawCircle(X, Y, radius, paint)
-            // frame.drawText(String(i), X, Y, paint, Skia.Font(undefined, 10))
           }
-
         }
-        // Extract pose keypoints with frame dimensions for proper scaling
-        // const poseResult = extractPoseKeypoints(output);
 
-        // const highConfidenceKeypoints = getHighConfidenceKeypoints(poseResult, 0.25);
-
-        // Create paint for drawing keypoints
-        // const keypointPaint = Skia.Paint();
-        // keypointPaint.setColor(Skia.Color('#00FF00')); // Green color
-        // keypointPaint.setStyle(0); // Fill style
-        //
-        // // Draw each high-confidence keypoint as a circle
-        // for (const { keypoint } of highConfidenceKeypoints) {
-        //   const radius = 8; // Circle radius in pixels
-        //   frame.drawCircle(keypoint.x, keypoint.y, radius, keypointPaint);
-        // }
-        //
-        // console.log(`Detected ${highConfidenceKeypoints.length} high-confidence keypoints`);
+        POSE_CONNECTIONS.forEach(([from, to]) => {
+          const fromX = Number(output[3 * from + 1]) * frameWidth
+          const fromY = Number(output[3 * from]) * frameHeight
+          const toX = Number(output[3 * to + 1]) * frameWidth
+          const toY = Number(output[3 * to]) * frameHeight
+          if (output[3 * from + 2] > MIN_CONFIDENCE && output[3 * to + 2]) {
+            frame.drawLine(fromX, fromY, toX, toY, paint)
+          }
+        })
 
       } catch (error) {
         console.error('Error processing keypoints:', error);

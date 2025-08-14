@@ -135,14 +135,14 @@ export const KEYPOINT_INDICES = {
  */
 export const POSE_CONNECTIONS = [
   // Face connections
-  [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.leftEye],
-  [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightEye],
-  [KEYPOINT_INDICES.leftEye, KEYPOINT_INDICES.leftEar],
-  [KEYPOINT_INDICES.rightEye, KEYPOINT_INDICES.rightEar],
+  // [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.leftEye],
+  // [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightEye],
+  // [KEYPOINT_INDICES.leftEye, KEYPOINT_INDICES.leftEar],
+  // [KEYPOINT_INDICES.rightEye, KEYPOINT_INDICES.rightEar],
 
   // Upper body connections
-  [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.leftShoulder],
-  [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightShoulder],
+  // [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.leftShoulder],
+  // [KEYPOINT_INDICES.nose, KEYPOINT_INDICES.rightShoulder],
   [KEYPOINT_INDICES.leftShoulder, KEYPOINT_INDICES.leftElbow],
   [KEYPOINT_INDICES.leftElbow, KEYPOINT_INDICES.leftWrist],
   [KEYPOINT_INDICES.rightShoulder, KEYPOINT_INDICES.rightElbow],
