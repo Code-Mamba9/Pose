@@ -5,8 +5,7 @@ import { Camera, useCameraDevice, useCameraPermission, useSkiaFrameProcessor, Dr
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
 import { Skia, PaintStyle } from '@shopify/react-native-skia';
-import { POSE_CONNECTIONS } from '@/constants/paint';
-import { MIN_CONFIDENCE } from '@/constants';
+import { POSE_CONNECTIONS, MIN_CONFIDENCE } from '@/constants';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
