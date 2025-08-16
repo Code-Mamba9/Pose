@@ -88,8 +88,6 @@ PoseApp/
 │       └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
 │
 ├── Configuration & Types
-│   ├── Types (types/)
-│   │   └── index.ts                # Global TypeScript type definitions
 │   ├── Constants (constants/)
 │   │   ├── index.ts                # Constants barrel export
 │   │   ├── Colors.ts               # Color scheme definitions
@@ -163,7 +161,6 @@ PoseApp/
   - `@/hooks/*` → hooks directory  
   - `@/constants/*` → constants directory
   - `@/utils/*` → utils directory
-  - `@/types/*` → types directory
   - `@/assets/*` → assets directory
 - Includes .expo/types for Expo-specific types
 
