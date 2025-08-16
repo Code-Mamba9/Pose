@@ -2,11 +2,7 @@ import { Image } from "expo-image";
 import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { CameraPermissionHandler } from "@/components/CameraPermissionHandler";
+import { HelloWave, ParallaxScrollView, ThemedText, ThemedView, CameraPermissionHandler } from "@/components";
 import { useCameraPermissions } from "@/utils/PermissionManager";
 
 export default function HomeScreen() {
