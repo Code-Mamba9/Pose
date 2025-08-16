@@ -86,8 +86,6 @@ PoseApp/
 │   │   ├── postureAnalysisService.ts # Posture analysis logic
 │   │   └── storageService.ts       # Data persistence service
 │   │
-│   ├── Core ML Services (src/services/) # Advanced ML pipeline
-│   │   └── KeypointExtractor.ts    # Keypoint extraction from model output
 │   │
 │   ├── State Management (store/)
 │   │   ├── index.ts                # Store barrel export
@@ -108,7 +106,8 @@ PoseApp/
 │   │   └── index.ts                # Global TypeScript type definitions
 │   ├── Constants (constants/)
 │   │   ├── index.ts                # Constants barrel export
-│   │   └── Colors.ts               # Color scheme definitions
+│   │   ├── Colors.ts               # Color scheme definitions
+│   │   └── keypoints.ts            # MoveNet keypoint indices and pose connections
 │   └── Hooks (hooks/)
 │       ├── index.ts                # Hooks barrel export
 │       ├── useColorScheme.ts/.web.ts # Color scheme detection

@@ -55,33 +55,10 @@ export const POSE_CONNECTIONS = [
 ] as const;
 
 /**
- * Extract individual keypoint from MoveNet output tensor
+ * Keypoint type definition
  */
-function extractKeypoint(
-  outputTensor: Float32Array,
-  keypointIndex: number
-): Keypoint {
-  'worklet';
-
-  // MoveNet output format: [batch, person, keypoint, [y, x, confidence]]
-  // For single person detection: tensor shape is flattened to [1 * 1 * 17 * 3] = [51]
-  const baseIndex = keypointIndex * 3;
-
-  // Bounds checking
-  if (baseIndex + 2 >= outputTensor.length) {
-    console.warn(`Keypoint index ${keypointIndex} out of bounds for tensor length ${outputTensor.length}`);
-    return { x: 0, y: 0, confidence: 0 };
-  }
-
-  const y = outputTensor[baseIndex];     // Y coordinate (normalized)
-  const x = outputTensor[baseIndex + 1]; // X coordinate (normalized)  
-  const confidence = outputTensor[baseIndex + 2]; // Confidence score
-
-  // Clamp values to valid ranges
-  return {
-    x: Math.max(0, Math.min(1, x || 0)),
-    y: Math.max(0, Math.min(1, y || 0)),
-    confidence: Math.max(0, Math.min(1, confidence || 0)),
-  };
+export interface Keypoint {
+  x: number;
+  y: number;
+  confidence: number;
 }
-
