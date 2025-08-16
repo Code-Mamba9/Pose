@@ -62,12 +62,6 @@ export default function HomeScreen() {
         </CameraPermissionHandler>
       </ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Advanced Testing</ThemedText>
-        <ThemedText>
-          For comprehensive testing, use the dedicated tabs: Explore (full pipeline), Test (preprocessing comparison), and Keypoints (ML output validation).
-        </ThemedText>
-      </ThemedView>
     </ParallaxScrollView>
   );
 }
