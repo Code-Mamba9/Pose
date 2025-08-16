@@ -54,11 +54,3 @@ export const POSE_CONNECTIONS = [
   [KEYPOINT_INDICES.rightKnee, KEYPOINT_INDICES.rightAnkle],
 ] as const;
 
-/**
- * Keypoint type definition
- */
-export interface Keypoint {
-  x: number;
-  y: number;
-  confidence: number;
-}
