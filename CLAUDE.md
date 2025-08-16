@@ -56,11 +56,9 @@ PoseApp/
 │   ├── _layout.tsx                 # Root layout with theme provider and navigation
 │   ├── +not-found.tsx              # 404 error page
 │   ├── (tabs)/                     # Tab-based routing
-│   │   ├── _layout.tsx             # Tab layout configuration (3 tabs: home, explore, test)
+│   │   ├── _layout.tsx             # Tab layout configuration (2 tabs: home, explore)
 │   │   ├── index.tsx               # Home tab screen
-│   │   ├── explore.tsx             # Explore tab screen (imports from src/screens/)
-│   │   └── test.tsx                # Test screen (imports from src/screens/)
-│   └── model-test.tsx              # ML model testing (standalone, not routed)
+│   │   └── explore.tsx             # Explore tab screen (imports from src/screens/)
 │
 ├── UI Components (components/)
 │   ├── Camera Components/
@@ -89,11 +87,7 @@ PoseApp/
 │   │   └── storageService.ts       # Data persistence service
 │   │
 │   ├── Core ML Services (src/services/) # Advanced ML pipeline
-│   │   ├── PoseDetectionPipeline.ts # Complete pose detection pipeline
-│   │   ├── ImagePreprocessor.ts    # ACTIVE - Worklet-compatible functional preprocessing with hardware acceleration
-│   │   ├── KeypointExtractor.ts    # Keypoint extraction from model output
-│   │   ├── MockMoveNetOutput.ts    # Mock MoveNet model output for testing
-│   │   └── ModelManager.ts         # TensorFlow Lite model management
+│   │   └── KeypointExtractor.ts    # Keypoint extraction from model output
 │   │
 │   ├── State Management (store/)
 │   │   ├── index.ts                # Store barrel export
@@ -106,20 +100,8 @@ PoseApp/
 │       └── PermissionManager.ts    # Device permissions management
 │
 ├── ML Development (src/)
-│   ├── Components (components/)
-│   │   ├── ImagePreprocessorDemo.tsx # Preprocessing visualization
-│   │   └── ModelTest.tsx           # Model testing interface
-│   │
-│   ├── Hooks (hooks/)
-│   │   ├── useModelManager.ts      # Model management hook
-│   │   └── useSafeResizePlugin.ts  # Safe resize plugin hook
-│   │
-│   ├── Screens (screens/)
-│   │   ├── TestPreprocessorScreen.tsx # Preprocessing testing screen
-│   │   └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
-│   │
-│   └── Utils (utils/)
-│       └── modelLoader.ts          # TensorFlow Lite model loading
+│   └── Screens (screens/)
+│       └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
 │
 ├── Configuration & Types
 │   ├── Types (types/)
@@ -140,7 +122,8 @@ PoseApp/
 │   │   ├── splash-icon.png
 │   │   └── react-logo*.png         # React logos (various sizes)
 │   └── models/
-│       └── movenet_lightning_f16.tflite # TensorFlow Lite pose detection model
+│       ├── movenet_lightning_f16.tflite # TensorFlow Lite pose detection model
+│       └── movenet_thunder.tflite        # TensorFlow Lite thunder variant model
 │
 ├── Platform-Specific
 │   ├── Android (android/)
@@ -179,25 +162,12 @@ PoseApp/
 
 #### Core Technologies
 - **ML/AI Stack**: TensorFlow Lite with MoveNet model for pose detection
-- **Camera Integration**: react-native-vision-camera with worklet-based frame processing
-- **Image Processing**: YUV to RGB conversion with resize optimization
-- **Performance**: Worklet-based processing for 60fps real-time analysis
-
-#### Development Patterns
-- **Theme System**: Uses `@react-navigation/native` themes with custom color scheme detection
-- **Path Aliases**: Comprehensive `@/*` mapping for clean imports across all directories
-- **State Management**: Zustand for lightweight, performant state management
-- **Platform Handling**: Platform-specific components and styling (iOS blur effects, etc.)
-- **Haptic Feedback**: Custom HapticTab component for enhanced UX
-- **Font Loading**: Custom SpaceMono font with async loading handling
-- **Error Recovery**: Comprehensive error handling and recovery strategies
-- **Memory Management**: Advanced memory optimization for ML workloads
+- **Camera Integration**: react-native-vision-camera with resize-plugin
 
 #### ML Pipeline Architecture
-- **Preprocessing**: Worklet-compatible functional preprocessing with hardware acceleration support (`processWithResizePlugin`) and software fallback (`processWithFallback`)
 - **Model Inference**: TensorFlow Lite MoveNet integration using `react-native-fast-tflite` 
 - **Keypoint Extraction**: 17-point human pose keypoint detection and processing
-- **Frame Processing**: Real-time frame processing using `react-native-vision-camera` with worklets
+- **Frame Processing**: Real-time frame processing using `react-native-vision-camera` with its resize plugin
 
 ### TypeScript Configuration
 - Strict mode enabled with comprehensive type checking
@@ -234,48 +204,5 @@ PoseApp/
   - `zustand` ^5.0.6 - State management
   - `react-native-reanimated` ~3.17.4 - Animations and worklets
 
-## Code Analysis Findings
 
-### Recent Code Cleanup and Updates (2025-01-10)
-
-**Navigation Architecture Updates:**
-- **Removed extraneous route**: `keypoints` tab removed from `app/(tabs)/_layout.tsx` (2025-01-10)
-  - **Issue**: Tab configuration existed without corresponding `keypoints.tsx` file
-  - **Fix**: Removed keypoints tab screen definition, now has 3 tabs: home, explore, test
-  - **Status**: Navigation error "route keypoint is extraneous" resolved
-
-**Screen Component Simplification:**
-- **`src/screens/PoseDetectionTestScreen.tsx`** - SIMPLIFIED (2025-01-10)
-  - **Removed**: Complex UI controls, metrics display, configuration panels
-  - **Current**: Minimal camera view with status overlay only
-  - **Cleanup**: Removed ~108 lines of unused styling code for deleted UI components
-
-### Code Cleanup and Refactoring (2025-01-07)
-
-**Image Preprocessing Architecture Refactoring:**
-- **`src/services/ImagePreprocessor.ts`** - REFACTORED from class-based to functional worklet-compatible architecture
-  - **Status**: ACTIVE - Now contains worklet-compatible functions for frame processing
-  - **Features**: Hardware acceleration support (`processWithResizePlugin`), software fallback (`processWithFallback`), main entry point (`preprocessFrame`)
-  - **Architecture**: Functional approach with standalone worklet functions instead of class methods
-  - **Import Chain**: `ImagePreprocessor.ts` → `PoseDetectionPipeline.ts`, `ImagePreprocessorDemo.tsx`
-
-**Removed Dead Code Files:**
-- **`src/services/ImagePreprocessorFunctions.ts`** - DELETED (2025-01-07)
-  - **Reason**: Completely superseded by refactored ImagePreprocessor.ts
-  - **Code Duplication**: Had ~200+ lines identical to ImagePreprocessor.ts
-  - **Status**: Was unused - no imports found in codebase
-
-- **`src/services/ImagePreprocessorOptimized.ts`** - DELETED (2025-01-07)
-  - **Reason**: Unused optimized implementation with advanced performance techniques
-  - **Features**: Vectorized operations, fixed-point math, cache-friendly processing
-  - **Status**: Dead code - not imported anywhere, user decided to "forget about this implementation"
-
-- **`src/hooks/useImagePreprocessor.ts`** - DELETED (Previously)
-  - **Reason**: React hook wrapper for unused ImagePreprocessor class
-
-**Current Architecture Status:**
-- **Navigation**: 3-tab layout (home, explore, test) with clean routing
-- **Preprocessing**: Single source of truth: `src/services/ImagePreprocessor.ts` with worklet-compatible functions
-- **Camera Integration**: Simplified test screen using `react-native-vision-camera` with `react-native-fast-tflite`
-- **Code Quality**: No code duplication, consolidated preprocessing logic, worklet-compatible for real-time frame processing
 

@@ -32,35 +32,21 @@ export default function HomeScreen() {
         <ThemedText type="title">Pose Detection App</ThemedText>
         <HelloWave />
       </ThemedView>
-      
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Camera Permission Status</ThemedText>
         <ThemedText>
           Camera Access: {hasPermission ? '✅ Granted' : '❌ Not Granted'}
         </ThemedText>
         {!hasPermission && (
-          <TouchableOpacity 
-            style={styles.permissionButton} 
+          <TouchableOpacity
+            style={styles.permissionButton}
             onPress={handleTestCameraPermission}
           >
             <ThemedText style={styles.buttonText}>Request Camera Permission</ThemedText>
           </TouchableOpacity>
         )}
       </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Model Loading Test</ThemedText>
-        <ThemedText>
-          Test TensorFlow Lite model loading and GPU acceleration.
-        </ThemedText>
-        <Link href="/model-test" asChild>
-          <TouchableOpacity style={styles.testButton}>
-            <ThemedText style={styles.buttonText}>🤖 Test Model Loading</ThemedText>
-          </TouchableOpacity>
-        </Link>
-      </ThemedView>
-
-
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Camera Permission Test</ThemedText>
