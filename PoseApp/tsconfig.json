@@ -17,9 +17,7 @@
       "@/hooks/*": ["./hooks/*"],
       "@/constants/*": ["./constants/*"],
       "@/utils/*": ["./utils/*"],
-      "@/types/*": ["./types/*"],
-      "@/store/*": ["./store/*"],
-      "@/services/*": ["./services/*"],
+      "@/screens/*": ["./screens/*"],
       "@/assets/*": ["./assets/*"]
     }
   },

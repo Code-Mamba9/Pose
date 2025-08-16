@@ -58,7 +58,7 @@ PoseApp/
 │   ├── (tabs)/                     # Tab-based routing
 │   │   ├── _layout.tsx             # Tab layout configuration (2 tabs: home, explore)
 │   │   ├── index.tsx               # Home tab screen
-│   │   └── explore.tsx             # Explore tab screen (imports from src/screens/)
+│   │   └── explore.tsx             # Explore tab screen (imports from screens/)
 │
 ├── UI Components (components/)
 │   ├── Camera Components/
@@ -83,9 +83,8 @@ PoseApp/
 │       ├── index.ts                # Utils barrel export with common utility functions
 │       └── PermissionManager.ts    # Device permissions management
 │
-├── ML Development (src/)
-│   └── Screens (screens/)
-│       └── PoseDetectionTestScreen.tsx # Pose detection pipeline test screen
+├── Screens (screens/)
+│   └── PoseDetectionTestScreen.tsx     # Pose detection pipeline test screen
 │
 ├── Configuration & Types
 │   ├── Constants (constants/)
@@ -161,6 +160,7 @@ PoseApp/
   - `@/hooks/*` → hooks directory  
   - `@/constants/*` → constants directory
   - `@/utils/*` → utils directory
+  - `@/screens/*` → screens directory
   - `@/assets/*` → assets directory
 - Includes .expo/types for Expo-specific types
 
