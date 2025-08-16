@@ -79,20 +79,6 @@ PoseApp/
 │   └── index.ts                    # Main components barrel export
 │
 ├── Business Logic
-│   ├── Services (services/)        # App-level services
-│   │   ├── index.ts                # Services barrel export
-│   │   ├── cameraService.ts        # Camera management service
-│   │   ├── poseDetectionService.ts # Mock pose detection (testing)
-│   │   ├── postureAnalysisService.ts # Posture analysis logic
-│   │   └── storageService.ts       # Data persistence service
-│   │
-│   │
-│   ├── State Management (store/)
-│   │   ├── index.ts                # Store barrel export
-│   │   ├── appStore.ts             # Global app state (Zustand)
-│   │   ├── poseStore.ts            # Pose detection state
-│   │   └── userStore.ts            # User data and preferences
-│   │
 │   └── Utilities (utils/)
 │       ├── index.ts                # Utils barrel export with common utility functions
 │       └── PermissionManager.ts    # Device permissions management
@@ -107,7 +93,7 @@ PoseApp/
 │   ├── Constants (constants/)
 │   │   ├── index.ts                # Constants barrel export
 │   │   ├── Colors.ts               # Color scheme definitions
-│   │   └── keypoints.ts            # MoveNet keypoint indices and pose connections
+│   │   └── paint.ts                # MoveNet keypoint indices and pose connections
 │   └── Hooks (hooks/)
 │       ├── index.ts                # Hooks barrel export
 │       ├── useColorScheme.ts/.web.ts # Color scheme detection
@@ -178,8 +164,6 @@ PoseApp/
   - `@/constants/*` → constants directory
   - `@/utils/*` → utils directory
   - `@/types/*` → types directory
-  - `@/store/*` → store directory
-  - `@/services/*` → services directory
   - `@/assets/*` → assets directory
 - Includes .expo/types for Expo-specific types
 
@@ -200,7 +184,6 @@ PoseApp/
   - `react-native-fast-tflite` ^1.6.1 - TensorFlow Lite integration
   - `react-native-worklets-core` ^1.6.0 - High-performance worklets
   - `vision-camera-resize-plugin` ^3.2.0 - Camera frame resizing
-  - `zustand` ^5.0.6 - State management
   - `react-native-reanimated` ~3.17.4 - Animations and worklets
 
 
