@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import "react-native-worklets-core";
+import "@/polyfills"
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 

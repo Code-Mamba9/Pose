@@ -46,7 +46,7 @@ export default function PoseDetectionTestScreen() {
 
       try {
         console.log(output)
-        paint.setColor(Skia.Color('red'));
+        paint.setColor(Skia.Color('white'));
         for (let i = 0; i < 17; i++) {
           const X = Number(output[3 * i + 1]) * frameWidth
           const Y = Number(output[3 * i]) * frameHeight
@@ -54,8 +54,8 @@ export default function PoseDetectionTestScreen() {
             frame.drawCircle(X, Y, radius, paint)
           }
         }
-        let i = 0;
 
+        let i = 0;
         POSE_CONNECTIONS.forEach(([from, to]) => {
           const fromX = Number(output[3 * from + 1]) * frameWidth
           const fromY = Number(output[3 * from]) * frameHeight

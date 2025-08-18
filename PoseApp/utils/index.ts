@@ -1,4 +1,5 @@
 // Utility functions for the Pose app
+import Constants from 'expo-constants';
 
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-US', {
@@ -52,5 +53,26 @@ export const asyncDelay = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+
+export const generateAPIUrl = (relativePath: string) => {
+  // const origin = "http://localhost:8081"
+  const origin = "http://192.168.18.78:8081";
+
+  const path = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
+
+  if (process.env.NODE_ENV === 'development') {
+    return origin.concat(path);
+  }
+
+  if (!process.env.EXPO_PUBLIC_API_BASE_URL) {
+    throw new Error(
+      'EXPO_PUBLIC_API_BASE_URL environment variable is not defined',
+    );
+  }
+  return process.env.EXPO_PUBLIC_API_BASE_URL.concat(path);
+};
 // Permission management exports
 export * from './PermissionManager';
+
+
+
