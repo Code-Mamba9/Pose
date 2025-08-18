@@ -5,7 +5,7 @@ import { Camera, useCameraDevice, useCameraPermission, useSkiaFrameProcessor, Dr
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
 import { Skia, PaintStyle } from '@shopify/react-native-skia';
-import { POSE_CONNECTIONS, MIN_CONFIDENCE } from '@/constants';
+import { POSE_CONNECTIONS, MIN_CONFIDENCE, COLORS } from '@/constants';
 
 export default function PoseDetectionTestScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -21,8 +21,7 @@ export default function PoseDetectionTestScreen() {
   const { resize } = useResizePlugin();
   const paint = Skia.Paint();
   paint.setStyle(PaintStyle.Fill);
-  paint.setStrokeWidth(3);
-  paint.setColor(Skia.Color('red'));
+  paint.setStrokeWidth(10);
 
   const radius = 10
   // Initialize pose detection frame processor with current config and model
@@ -47,6 +46,7 @@ export default function PoseDetectionTestScreen() {
 
       try {
         console.log(output)
+        paint.setColor(Skia.Color('red'));
         for (let i = 0; i < 17; i++) {
           const X = Number(output[3 * i + 1]) * frameWidth
           const Y = Number(output[3 * i]) * frameHeight
@@ -54,6 +54,7 @@ export default function PoseDetectionTestScreen() {
             frame.drawCircle(X, Y, radius, paint)
           }
         }
+        let i = 0;
 
         POSE_CONNECTIONS.forEach(([from, to]) => {
           const fromX = Number(output[3 * from + 1]) * frameWidth
@@ -61,8 +62,10 @@ export default function PoseDetectionTestScreen() {
           const toX = Number(output[3 * to + 1]) * frameWidth
           const toY = Number(output[3 * to]) * frameHeight
           if (output[3 * from + 2] > MIN_CONFIDENCE && output[3 * to + 2]) {
+            paint.setColor(Skia.Color(COLORS[i]));
             frame.drawLine(fromX, fromY, toX, toY, paint)
           }
+          i++;
         })
 
       } catch (error) {

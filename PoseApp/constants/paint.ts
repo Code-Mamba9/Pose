@@ -54,3 +54,19 @@ export const POSE_CONNECTIONS = [
   [KEYPOINT_INDICES.rightKnee, KEYPOINT_INDICES.rightAnkle],
 ] as const;
 
+export const COLORS = [
+  "red",
+  "blue",
+  "green",
+  "pink",
+  "yellow",
+  "red",
+  "blue",
+  "green",
+  "pink",
+  "yellow",
+  "red",
+  "blue",
+  "green",
+  "pink",
+] as const;
