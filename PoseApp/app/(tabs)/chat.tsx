@@ -22,10 +22,9 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle
 } from 'react-native-reanimated';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ThemedText, ThemedView } from '@/components';
+import { useThemeColor } from '@/hooks';
 
 export default function Chat() {
   const [input, setInput] = useState('');
@@ -43,7 +42,6 @@ export default function Chat() {
     onError: error => console.error(error, 'ERROR'),
   });
 
-  // Theme colors - All hooks must be called at top level
   const backgroundColor = useThemeColor({}, 'background');
   const tintColor = useThemeColor({}, 'tint');
   const iconColor = useThemeColor({}, 'icon');
