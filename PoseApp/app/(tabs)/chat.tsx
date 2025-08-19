@@ -169,7 +169,7 @@ export default function Chat() {
           ))}
 
           {/* Loading indicator */}
-          {(status === 'submitted' || status === 'streaming') && (
+          {status === 'submitted' && (
             <Animated.View
               entering={FadeInLeft}
               style={[
